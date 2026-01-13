@@ -22,7 +22,7 @@
 
 <configuration>
 
-	<typeHandlers>		
+	<typeHandlers>
 		<typeHandler handler="org.apache.ibatis.submitted.hashmaptypehandler.HashMapTypeHandler" />
 	</typeHandlers>
 

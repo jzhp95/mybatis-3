@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.builder;
 
-import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 
 public class ExampleObjectFactory extends DefaultObjectFactory {
   private Properties properties;

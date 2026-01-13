@@ -25,7 +25,6 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.apache.ibatis.submitted.named_constructor_args.usesjava8.Mapper;
 import org.apache.ibatis.submitted.named_constructor_args.User;
 import org.junit.BeforeClass;
 import org.junit.Test;

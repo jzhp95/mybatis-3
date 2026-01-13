@@ -16,6 +16,13 @@
 package org.apache.ibatis.submitted.complex_property;
 
 import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Calendar;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
@@ -23,12 +30,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Calendar;
 
 public class ComponentTest {
   private static SqlSessionFactory sqlSessionFactory;

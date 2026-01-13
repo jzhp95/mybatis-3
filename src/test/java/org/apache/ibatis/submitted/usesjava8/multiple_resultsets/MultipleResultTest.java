@@ -42,7 +42,7 @@ import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import ru.yandex.qatools.embed.postgresql.util.SocketUtil;
 
 /*
- * This class contains tests for multiple results.  
+ * This class contains tests for multiple results.
  * It is based on Jeff's ref cursor tests.
  */
 @Category(EmbeddedPostgresqlTests.class)

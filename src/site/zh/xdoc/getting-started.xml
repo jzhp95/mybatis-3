@@ -28,7 +28,7 @@
 
   <body>
     <section name="入门">
-    
+
     <subsection name="安装">
       <p>要使用 MyBatis， 只需将 <a href="https://github.com/mybatis/mybatis-3/releases">mybatis-x.x.x.jar</a> 文件置于 classpath 中即可。</p>
       <p>如果使用 Maven 来构建项目，则需将下面的 dependency 代码置于 pom.xml 文件中：</p>
@@ -38,8 +38,8 @@
   <artifactId>mybatis</artifactId>
   <version>x.x.x</version>
 </dependency>]]></source>
-    </subsection>    
-    
+    </subsection>
+
     <subsection name="从 XML 中构建 SqlSessionFactory">
       <p>每个基于 MyBatis 的应用都是以一个 SqlSessionFactory 的实例为中心的。SqlSessionFactory 的实例可以通过 SqlSessionFactoryBuilder 获得。而 SqlSessionFactoryBuilder 则可以从 XML 配置文件或一个预先定制的 Configuration 的实例构建出 SqlSessionFactory 的实例。</p>
       <p>从 XML 文件中构建 SqlSessionFactory 的实例非常简单，建议使用类路径下的资源文件进行配置。但是也可以使用任意的输入流(InputStream)实例，包括字符串形式的文件路径或者 file:// 的 URL 形式的文件路径来配置。MyBatis 包含一个名叫 Resources 的工具类，它包含一些实用方法，可使从 classpath 或其他位置加载资源文件更加容易。</p>
@@ -120,7 +120,7 @@ Blog blog = mapper.selectBlog(101);]]></source>
       <hr/>
       <p><span class="label important">提示</span><strong>命名空间的一点注释</strong></p>
       <p><strong>命名空间（Namespaces）</strong>在之前版本的 MyBatis 中是可选的，这样容易引起混淆因此毫无益处。现在命名空间则是必须的，且意于简单地用更长的完全限定名来隔离语句。</p>
-      <p>命名空间使得你所见到的接口绑定成为可能，尽管你觉得这些东西未必用得上，你还是应该遵循这里的规定以防哪天你改变了主意。出于长远考虑，使用命名空间，并将它置于合适的 Java 包命名空间之下，你将拥有一份更加整洁的代码并提高了 MyBatis 的可用性。</p>      
+      <p>命名空间使得你所见到的接口绑定成为可能，尽管你觉得这些东西未必用得上，你还是应该遵循这里的规定以防哪天你改变了主意。出于长远考虑，使用命名空间，并将它置于合适的 Java 包命名空间之下，你将拥有一份更加整洁的代码并提高了 MyBatis 的可用性。</p>
       <p>
         <strong>命名解析：</strong>为了减少输入量，MyBatis 对所有的命名配置元素（包括语句，结果映射，缓存等）使用了如下的命名解析规则。
       </p>

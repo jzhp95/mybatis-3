@@ -15,6 +15,12 @@
  */
 package org.apache.ibatis.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.sql.DataSource;
+
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.domain.blog.Author;
@@ -26,11 +32,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.varia.NullAppender;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import javax.sql.DataSource;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for specify the behavior when detects an unknown column (or unknown property type) of automatic mapping target.

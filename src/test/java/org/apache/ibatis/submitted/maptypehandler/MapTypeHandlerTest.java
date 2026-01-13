@@ -83,5 +83,5 @@ public class MapTypeHandlerTest {
       sqlSession.close();
     }
   }
-  
+
 }

@@ -15,6 +15,9 @@
  */
 package org.apache.ibatis.submitted.mapper_extend;
 
+import static com.googlecode.catchexception.apis.BDDCatchException.*;
+import static org.assertj.core.api.BDDAssertions.then;
+
 import java.io.Reader;
 import java.sql.Connection;
 
@@ -27,9 +30,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static com.googlecode.catchexception.apis.BDDCatchException.*;
-import static org.assertj.core.api.BDDAssertions.then;
 
 public class MapperExtendTest {
 

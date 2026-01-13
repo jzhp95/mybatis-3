@@ -18,6 +18,7 @@ package org.apache.ibatis.builder.xml;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.BaseBuilder;
@@ -104,7 +105,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     /**
      * 解析 configuration 节点
      * 按照 MyBatis 配置文件的规范顺序解析各个配置元素
-     * 
+     *
      * @param root configuration 节点的 XNode 对象
      * @throws BuilderException 如果解析过程中出现异常
      */
@@ -113,41 +114,41 @@ public class XMLConfigBuilder extends BaseBuilder {
             //issue #117 read properties first
             // 解析 properties 节点 - 必须最先解析，因为其他配置可能引用属性值
             propertiesElement(root.evalNode("properties"));
-            
+
             // 解析 settings 节点并转换为 Properties 对象
             Properties settings = settingsAsProperties(root.evalNode("settings"));
-            
+
             // 加载自定义 VFS (Virtual File System) 实现
             loadCustomVfs(settings);
-            
+
             // 解析类型别名配置
             typeAliasesElement(root.evalNode("typeAliases"));
-            
+
             // 解析插件配置
             pluginElement(root.evalNode("plugins"));
-            
+
             // 解析对象工厂配置
             objectFactoryElement(root.evalNode("objectFactory"));
-            
+
             // 解析对象包装器工厂配置
             objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
-            
+
             // 解析反射器工厂配置
             reflectorFactoryElement(root.evalNode("reflectorFactory"));
-            
+
             // 应用 settings 配置到 Configuration 对象
             settingsElement(settings);
-            
+
             // read it after objectFactory and objectWrapperFactory issue #631
             // 解析环境配置（数据源、事务管理器等）
             environmentsElement(root.evalNode("environments"));
-            
+
             // 解析数据库标识提供者配置
             databaseIdProviderElement(root.evalNode("databaseIdProvider"));
-            
+
             // 解析类型处理器配置
             typeHandlerElement(root.evalNode("typeHandlers"));
-            
+
             // 解析映射器配置（最后解析，因为可能依赖前面的配置）
             mapperElement(root.evalNode("mappers"));
         } catch (Exception e) {
@@ -251,7 +252,7 @@ public class XMLConfigBuilder extends BaseBuilder {
      * 解析 properties 配置元素
      * 支持三种方式加载属性：内联属性、资源文件、URL 文件
      * 按照优先级合并属性：内联属性 < 外部文件属性 < 程序传入属性
-     * 
+     *
      * @param context properties 节点的 XNode 对象
      * @throws BuilderException 如果同时指定了 resource 和 url 属性，或者加载属性文件失败
      */
@@ -259,31 +260,31 @@ public class XMLConfigBuilder extends BaseBuilder {
         if (context != null) {
             // 获取内联定义的属性（在 properties 标签内直接定义的属性）
             Properties defaults = context.getChildrenAsProperties();
-            
+
             // 获取外部属性文件的资源路径和 URL 路径
             String resource = context.getStringAttribute("resource");
             String url = context.getStringAttribute("url");
-            
+
             // 检查是否同时指定了 resource 和 url（不允许同时指定）
             if (resource != null && url != null) {
                 throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");
             }
-            
+
             // 加载资源文件中的属性并合并到 defaults 中
             if (resource != null) {
                 defaults.putAll(Resources.getResourceAsProperties(resource));
-            } 
+            }
             // 加载 URL 文件中的属性并合并到 defaults 中
             else if (url != null) {
                 defaults.putAll(Resources.getUrlAsProperties(url));
             }
-            
+
             // 获取程序运行时传入的属性（最高优先级）
             Properties vars = configuration.getVariables();
             if (vars != null) {
                 defaults.putAll(vars);
             }
-            
+
             // 将最终的属性设置到解析器和配置对象中
             parser.setVariables(defaults);
             configuration.setVariables(defaults);

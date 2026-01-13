@@ -18,7 +18,7 @@ package org.apache.ibatis.submitted.emptycollection;
 import java.util.List;
 
 public class TodoLists {
-  
+
   @Override
   public String toString() {
     return "TodoLists [id=" + id + ", todoItems=" + todoItems + "]";
@@ -27,7 +27,7 @@ public class TodoLists {
   private int id;
 
   private List<TodoItem> todoItems;
-  
+
   public int getId() {
     return id;
   }

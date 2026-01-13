@@ -33,7 +33,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 public class SubstitutionInAnnotsTest {
 
   protected static SqlSessionFactory sqlSessionFactory;
@@ -81,7 +80,7 @@ public class SubstitutionInAnnotsTest {
       sqlSession.close();
     }
   }
-  
+
   @Test
   public void testSubstitutionWithAnnotsParameter() {
     SqlSession sqlSession = sqlSessionFactory.openSession();

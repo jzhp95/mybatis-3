@@ -15,6 +15,8 @@
  */
 package org.apache.ibatis.submitted.immutable_constructor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.sql.Connection;
@@ -26,9 +28,6 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-
-import static org.junit.Assert.assertEquals;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -91,5 +90,5 @@ public final class ImmutablePOJOTest {
       session.close();
     }
   }
-  
+
 }

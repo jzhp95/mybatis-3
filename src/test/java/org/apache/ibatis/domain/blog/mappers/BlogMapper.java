@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.domain.blog.mappers;
 
-import org.apache.ibatis.session.RowBounds;
-
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
 
 public interface BlogMapper {
 

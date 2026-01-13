@@ -465,6 +465,7 @@ public class Configuration {
     /**
      * Set a default {@link TypeHandler} class for {@link Enum}.
      * A default {@link TypeHandler} is {@link org.apache.ibatis.type.EnumTypeHandler}.
+     *
      * @param typeHandler a type handler class for {@link Enum}
      * @since 3.4.5
      */
@@ -531,7 +532,9 @@ public class Configuration {
         return languageRegistry.getDefaultDriver();
     }
 
-    /** @deprecated Use {@link #getDefaultScriptingLanguageInstance()} */
+    /**
+     * @deprecated Use {@link #getDefaultScriptingLanguageInstance()}
+     */
     @Deprecated
     public LanguageDriver getDefaultScriptingLanuageInstance() {
         return getDefaultScriptingLanguageInstance();
@@ -564,6 +567,34 @@ public class Configuration {
         return newExecutor(transaction, defaultExecutorType);
     }
 
+    /**
+     * 创建一个新的执行器实例。
+     * <p>
+     * 该方法根据指定的执行器类型创建相应的执行器实例，并应用缓存和拦截器功能。
+     * 执行器类型的选择优先级如下：
+     * 1. 如果指定了executorType参数，则使用该类型
+     * 2. 如果executorType为null，则使用默认执行器类型(defaultExecutorType)
+     * 3. 如果默认执行器类型也为null，则使用SIMPLE类型作为最终选择
+     * <p>
+     * 支持的执行器类型包括：
+     * - BATCH: 批处理执行器，用于批量操作
+     * - REUSE: 重用执行器，重用预处理语句
+     * - SIMPLE: 简单执行器，每次执行都创建新的预处理语句
+     * <p>
+     * 如果缓存功能启用(cacheEnabled=true)，会在基础执行器上包装一层缓存执行器。
+     * 最后，所有已注册的拦截器会应用到执行器实例上。
+     *
+     * @param transaction  数据库事务对象，用于执行器与数据库的交互
+     * @param executorType 执行器类型，如果为null则使用默认类型
+     * @return 配置好的执行器实例，已应用缓存和拦截器
+     * @see ExecutorType#BATCH
+     * @see ExecutorType#REUSE
+     * @see ExecutorType#SIMPLE
+     * @see BatchExecutor
+     * @see ReuseExecutor
+     * @see SimpleExecutor
+     * @see CachingExecutor
+     */
     public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
         executorType = executorType == null ? defaultExecutorType : executorType;
         executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
@@ -575,9 +606,13 @@ public class Configuration {
         } else {
             executor = new SimpleExecutor(this, transaction);
         }
+
+        // 如果开启了缓存功能，包装一层缓存执行器
         if (cacheEnabled) {
             executor = new CachingExecutor(executor);
         }
+
+        // 应用所有已注册的拦截器
         executor = (Executor) interceptorChain.pluginAll(executor);
         return executor;
     }

@@ -25,7 +25,7 @@ public class ArrayUtil {
 
   /**
    * Returns a hash code for {@code obj}.
-   * 
+   *
    * @param obj
    *          The object to get a hash code for. May be an array or <code>null</code>.
    * @return A hash code of {@code obj} or 0 if {@code obj} is <code>null</code>
@@ -70,7 +70,7 @@ public class ArrayUtil {
    * <li>{@code thisObj} and {@code thatObj} are arrays with the same component type and
    * equals() method of {@link Arrays} returns <code>true</code> (not deepEquals())</li>
    * </ul>
-   * 
+   *
    * @param thisObj
    *          The left hand object to compare. May be an array or <code>null</code>
    * @param thatObj
@@ -115,7 +115,7 @@ public class ArrayUtil {
   /**
    * If the {@code obj} is an array, toString() method of {@link Arrays} is called. Otherwise
    * {@link Object#toString()} is called. Returns "null" if {@code obj} is <code>null</code>.
-   * 
+   *
    * @param obj
    *          An object. May be an array or <code>null</code>.
    * @return String representation of the {@code obj}.

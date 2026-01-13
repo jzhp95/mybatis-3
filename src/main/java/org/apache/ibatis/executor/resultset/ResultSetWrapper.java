@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.session.Configuration;
@@ -87,7 +88,7 @@ public class ResultSetWrapper {
    * Gets the type handler to use when reading the result set.
    * Tries to get from the TypeHandlerRegistry by searching for the property type.
    * If not found it gets the column JDBC type and tries to get a handler for it.
-   * 
+   *
    * @param propertyType
    * @param columnName
    * @return
@@ -186,5 +187,5 @@ public class ResultSetWrapper {
     }
     return prefixed;
   }
-  
+
 }

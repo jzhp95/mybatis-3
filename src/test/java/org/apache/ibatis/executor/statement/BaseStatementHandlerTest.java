@@ -15,6 +15,11 @@
  */
 package org.apache.ibatis.executor.statement;
 
+import static org.mockito.Mockito.*;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
@@ -25,11 +30,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BaseStatementHandlerTest {

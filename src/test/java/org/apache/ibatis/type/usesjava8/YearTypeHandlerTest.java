@@ -26,7 +26,7 @@ import org.apache.ibatis.type.YearTypeHandler;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Eduardo Macarron
  */
 public class YearTypeHandlerTest extends BaseTypeHandlerTest {

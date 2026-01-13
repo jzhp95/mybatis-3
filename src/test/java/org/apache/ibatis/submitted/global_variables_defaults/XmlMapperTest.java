@@ -15,6 +15,10 @@
  */
 package org.apache.ibatis.submitted.global_variables_defaults;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Properties;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.parsing.PropertyParser;
 import org.apache.ibatis.session.Configuration;
@@ -23,10 +27,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Properties;
 
 public class XmlMapperTest {
 

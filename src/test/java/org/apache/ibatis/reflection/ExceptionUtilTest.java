@@ -16,10 +16,11 @@
 package org.apache.ibatis.reflection;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+
+import org.junit.Test;
 
 public class ExceptionUtilTest {
 

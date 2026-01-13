@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class Order implements Serializable {
 
   private static final long serialVersionUID = 1L;

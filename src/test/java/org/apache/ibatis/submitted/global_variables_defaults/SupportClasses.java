@@ -15,12 +15,12 @@
  */
 package org.apache.ibatis.submitted.global_variables_defaults;
 
+import java.lang.reflect.Field;
+import java.util.Properties;
+
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-
-import java.lang.reflect.Field;
-import java.util.Properties;
 
 public class SupportClasses {
 

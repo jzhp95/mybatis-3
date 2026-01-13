@@ -15,6 +15,10 @@
  */
 package org.apache.ibatis.logging.jdbc;
 
+import static org.mockito.Mockito.*;
+
+import java.sql.*;
+
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.type.JdbcType;
 import org.junit.Assert;
@@ -23,10 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.sql.*;
-
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PreparedStatementLoggerTest {

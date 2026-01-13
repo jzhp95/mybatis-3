@@ -15,12 +15,12 @@
  */
 package org.apache.ibatis.submitted.multipleresultsetswithassociation;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.mapping.StatementType;
-
-import java.util.List;
 
 public interface Mapper {
 

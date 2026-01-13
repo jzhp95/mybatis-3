@@ -26,7 +26,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Eduardo Macarron
  */
 public class MonthTypeHandlerTest extends BaseTypeHandlerTest {

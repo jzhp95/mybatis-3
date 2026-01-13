@@ -17,6 +17,7 @@ package org.apache.ibatis.jdbc;
 
 import static org.apache.ibatis.jdbc.SelectBuilder.*;
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class SelectBuilderTest {

@@ -41,7 +41,7 @@ public @interface CacheNamespace {
   int size() default 1024;
 
   boolean readWrite() default true;
-  
+
   boolean blocking() default false;
 
   /**
@@ -49,5 +49,5 @@ public @interface CacheNamespace {
    * @since 3.4.2
    */
   Property[] properties() default {};
-  
+
 }

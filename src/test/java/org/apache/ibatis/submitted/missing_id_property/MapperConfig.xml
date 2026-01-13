@@ -42,7 +42,7 @@
 			</dataSource>
 		</environment>
 	</environments>
-	
+
 	<mappers>
 		<mapper resource="org/apache/ibatis/submitted/missing_id_property/Map.xml" />
 	</mappers>

@@ -58,7 +58,7 @@ public class DaoTest {
     final List<TodoLists> actual = dao.selectWithEmptyList();
     Assert.assertEquals(1, actual.size());
     final List<TodoItem> todoItems = actual.get(0).getTodoItems();
-    Assert.assertEquals("expect " + todoItems + " to be empty", 0, todoItems.size());        
+    Assert.assertEquals("expect " + todoItems + " to be empty", 0, todoItems.size());
   }
 
   @Test

@@ -38,7 +38,7 @@
 			</dataSource>
 		</environment>
 	</environments>
-	
+
 	<mappers>
 		<mapper class="org.apache.ibatis.submitted.simplelistparameter.CarMapper" />
 	</mappers>

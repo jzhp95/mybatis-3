@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.submitted.dynsql2;
 
+import java.sql.*;
+
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-
-import java.sql.*;
 
 public class LastNameTypeHandler implements TypeHandler {
 

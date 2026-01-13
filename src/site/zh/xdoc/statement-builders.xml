@@ -362,7 +362,7 @@ public String updatePersonSql() {
               <td>
                 <code>UPDATE(String)</code>
               </td>
-              <td>开始一个update语句并指定需要更新的表明。后面都会跟着一个或者多个SET()，通常也会有一个WHERE()。 
+              <td>开始一个update语句并指定需要更新的表明。后面都会跟着一个或者多个SET()，通常也会有一个WHERE()。
               </td>
             </tr>
             <tr>

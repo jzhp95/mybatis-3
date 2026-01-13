@@ -15,15 +15,15 @@
  */
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import org.mockito.Mock;
-
-import java.sql.Array;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.sql.Array;
+
+import org.junit.Test;
+import org.mockito.Mock;
 
 public class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 

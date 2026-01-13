@@ -30,9 +30,9 @@ public interface MapperWithOneAndMany {
     "SELECT *",
     "FROM blog"
   })
-  @Results({ 
+  @Results({
     @Result(
-       property = "author", column = "author_id", 
+       property = "author", column = "author_id",
        one = @One(select = "org.apache.ibatis.binding.BoundAuthorMapper.selectAuthor"),
        many = @Many(select = "selectPostsById"))
   })

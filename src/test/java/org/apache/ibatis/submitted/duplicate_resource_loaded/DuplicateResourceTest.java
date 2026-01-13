@@ -15,18 +15,18 @@
  */
 package org.apache.ibatis.submitted.duplicate_resource_loaded;
 
-import org.junit.Assert;
+import java.io.Reader;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.Reader;
-import java.util.List;
-import java.util.Map;
 
 public class DuplicateResourceTest extends BaseDataTest {
 

@@ -59,7 +59,7 @@ public class XmlExternalRefTest {
     }
     configuration.getMappedStatementNames();
   }
-  
+
   @Test(expected = BuilderException.class)
   public void testFailFastOnBuildAllWithInsert() throws Exception {
     Configuration configuration = new Configuration();

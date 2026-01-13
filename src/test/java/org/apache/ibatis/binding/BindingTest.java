@@ -198,7 +198,7 @@ public class BindingTest {
       session.close();
     }
   }
-  
+
   @Test
   public void shouldExecuteBoundSelectMapOfBlogsById() {
     SqlSession session = sqlSessionFactory.openSession();
@@ -424,7 +424,7 @@ public class BindingTest {
       session.close();
     }
   }
-  
+
   @Ignore
   @Test // issue #480 and #101
   public void shouldExecuteBoundSelectBlogUsingConstructorWithResultMapCollection() {
@@ -441,7 +441,7 @@ public class BindingTest {
       session.close();
     }
   }
-  
+
   @Test
   public void shouldExecuteBoundSelectOneBlogStatementWithConstructorUsingXMLConfig() {
     SqlSession session = sqlSessionFactory.openSession();
@@ -712,7 +712,7 @@ public class BindingTest {
       assertEquals(101, blogs.get(0).getAuthor().getId());
       assertEquals(1, blogs.get(0).getPosts().size());
       assertEquals(1, blogs.get(0).getPosts().get(0).getId());
-      assertTrue(blogs.get(1) instanceof Proxy);      
+      assertTrue(blogs.get(1) instanceof Proxy);
       assertEquals(102, blogs.get(1).getAuthor().getId());
       assertEquals(1, blogs.get(1).getPosts().size());
       assertEquals(2, blogs.get(1).getPosts().get(0).getId());
@@ -732,7 +732,7 @@ public class BindingTest {
       assertEquals(101, blogs.get(0).getAuthor().getId());
       assertEquals(1, blogs.get(0).getPosts().size());
       assertEquals(1, blogs.get(0).getPosts().get(0).getId());
-      assertFalse(blogs.get(1) instanceof Factory);      
+      assertFalse(blogs.get(1) instanceof Factory);
       assertEquals(102, blogs.get(1).getAuthor().getId());
       assertEquals(1, blogs.get(1).getPosts().size());
       assertEquals(2, blogs.get(1).getPosts().get(0).getId());

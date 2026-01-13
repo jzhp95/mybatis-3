@@ -27,14 +27,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -214,5 +213,5 @@ public class BatchKeysTest {
       sqlSession.close();
     }
   }
-  
+
 }

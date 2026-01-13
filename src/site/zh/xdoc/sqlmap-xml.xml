@@ -344,7 +344,7 @@ ps.setInt(1,id);]]></source>
 
         <p>这里有一个简单（甚至很傻）的示例，它可以生成一个随机 ID（你最好不要这么做，但这里展示了 MyBatis 处理问题的灵活性及其所关心的广度）：
         </p>
-        
+
         <source><![CDATA[<insert id="insertAuthor">
   <selectKey keyProperty="id" resultType="int" order="BEFORE">
     select CAST(RANDOM()*1000000 as INTEGER) a from SYSIBM.SYSDUMMY1
@@ -553,7 +553,7 @@ public class User {
   private int id;
   private String username;
   private String hashedPassword;
-  
+
   public int getId() {
     return id;
   }
@@ -789,19 +789,19 @@ ResultMap 就是 MyBatis 对这个问题的答案。
             </tr>
             <tr>
               <td><code>type</code></td>
-              <td>类的完全限定名, 或者一个类型别名 (内置的别名可以参考上面的表格). 
+              <td>类的完全限定名, 或者一个类型别名 (内置的别名可以参考上面的表格).
               </td>
             </tr>
             <tr>
               <td><code>autoMapping</code></td>
-              <td>如果设置这个属性，MyBatis将会为这个ResultMap开启或者关闭自动映射。这个属性会覆盖全局的属性 autoMappingBehavior。默认值为：unset。 
+              <td>如果设置这个属性，MyBatis将会为这个ResultMap开启或者关闭自动映射。这个属性会覆盖全局的属性 autoMappingBehavior。默认值为：unset。
               </td>
             </tr>
           </tbody>
         </table>
 
         <p>
-          <span class="label important">最佳实践</span> 
+          <span class="label important">最佳实践</span>
 最好一步步地建立结果映射。单元测试可以在这个过程中起到很大帮助。如果你尝试一次创建一个像上面示例那样的巨大的结果映射，
 那么很可能会出现错误而且很难去使用它来完成工作。
 从最简单的形态开始，逐步进化。而且别忘了单元测试！使用框架的缺点是有时候它们看上去像黑盒子(无论源代码是否可见)。
@@ -1269,7 +1269,7 @@ resultMap
 				通过对这个属性指定非空的列将改变默认行为，这样做之后Mybatis将仅在这些列非空时才创建一个子对象。
 				可以指定多个列名，使用逗号分隔。默认值：未设置(unset)。
               </td>
-            </tr>            
+            </tr>
             <tr>
               <td><code>autoMapping</code></td>
               <td>
@@ -1650,7 +1650,7 @@ MyBatis 会从结果集中得到每条记录,
         </p>
 
       </subsection>
-      
+
       <subsection name="自动映射" id="Auto-mapping">
 
         <p>
@@ -1669,7 +1669,7 @@ MyBatis 会从结果集中得到每条记录,
            通常数据库列使用大写单词命名，单词间用下划线分隔；而java属性一般遵循驼峰命名法。
            为了在这两种命名方式之间启用自动映射，需要将 <code>mapUnderscoreToCamelCase</code>设置为true。
         </p>
-        
+
         <p>
            自动映射甚至在特定的result map下也能工作。在这种情况下，对于每一个result map,所有的ResultSet提供的列，
            如果没有被手工映射，则将被自动映射。自动映射处理完毕后手工映射才会被处理。
@@ -1691,7 +1691,7 @@ MyBatis 会从结果集中得到每条记录,
         <p>
           有三种自动映射等级：
         </p>
-        
+
         <ul>
           <li>
             <code>NONE</code> - 禁用自动映射。仅设置手动映射属性。
@@ -1707,7 +1707,7 @@ MyBatis 会从结果集中得到每条记录,
         <p>
           默认值是<code>PARTIAL</code>，这是有原因的。当使用<code>FULL</code>时，自动映射会在处理join结果时执行，并且join取得若干相同行的不同实体数据，因此这可能导致非预期的映射。下面的例子将展示这种风险：
         </p>
-        
+
         <source><![CDATA[<select id="selectBlog" resultMap="blogResult">
   select
     B.id,
@@ -1724,7 +1724,7 @@ MyBatis 会从结果集中得到每条记录,
 <resultMap id="authorResult" type="Author">
   <result property="username" column="author_username"/>
 </resultMap>]]></source>
-        
+
         <p>
           在结果中<i>Blog</i>和<i>Author</i>均将自动映射。但是注意<i>Author</i>有一个<i>id</i>属性，在ResultSet中有一个列名为<i>id</i>，
 		  所以Author的id将被填充为Blog的id，这不是你所期待的。所以需要谨慎使用<code>FULL</code>。
@@ -1737,9 +1737,9 @@ MyBatis 会从结果集中得到每条记录,
         <source><![CDATA[<resultMap id="userResultMap" type="User" autoMapping="false">
   <result property="password" column="hashed_password"/>
 </resultMap>]]></source>
-              
+
       </subsection>
-      
+
       <subsection name="缓存" id="cache">
         <p>
 MyBatis 包含一个非常强大的查询缓存特性,它可以非常方便地配置和定制。MyBatis 3

@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * Unit test for VFS getInstance method in multi-thread environment
- * 
+ *
  * @author: jasonleaster
  */
 public class VFSTest {

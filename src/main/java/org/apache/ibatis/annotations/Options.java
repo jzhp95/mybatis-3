@@ -61,6 +61,6 @@ public @interface Options {
   String keyProperty() default "id";
 
   String keyColumn() default "";
-  
+
   String resultSets() default "";
 }

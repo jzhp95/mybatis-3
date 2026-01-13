@@ -15,9 +15,9 @@
  */
 package org.apache.ibatis.autoconstructor;
 
-import org.apache.ibatis.annotations.Select;
-
 import java.util.List;
+
+import org.apache.ibatis.annotations.Select;
 
 public interface AutoConstructorMapper {
   @Select("SELECT * FROM subject WHERE id = #{id}")

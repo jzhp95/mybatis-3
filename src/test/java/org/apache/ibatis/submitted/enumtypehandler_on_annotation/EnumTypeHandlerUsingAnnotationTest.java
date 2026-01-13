@@ -15,6 +15,12 @@
  */
 package org.apache.ibatis.submitted.enumtypehandler_on_annotation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
@@ -24,12 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for type handler of enum using annotations.

@@ -15,6 +15,10 @@
  */
 package org.apache.ibatis.submitted.manyanno;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -23,10 +27,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 public class ManyAnnoTest extends BaseDataTest {
 
@@ -37,7 +37,7 @@ public class ManyAnnoTest extends BaseDataTest {
     config.addMapper(PostMapper.class);
     final SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(config);
     final SqlSession session = factory.openSession();
-    
+
     PostMapper mapper = session.getMapper(PostMapper.class);
     List<AnnoPost> posts = mapper.getPosts(101);
 

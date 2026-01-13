@@ -143,7 +143,7 @@ public class TypeAliasRegistry {
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
     if (aliasAnnotation != null) {
       alias = aliasAnnotation.value();
-    } 
+    }
     registerAlias(alias, type);
   }
 
@@ -166,7 +166,7 @@ public class TypeAliasRegistry {
       throw new TypeException("Error registering type alias "+alias+" for "+value+". Cause: " + e, e);
     }
   }
-  
+
   /**
    * @since 3.2.2
    */

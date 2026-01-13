@@ -15,9 +15,10 @@
  */
 package org.apache.ibatis.io;
 
-import org.apache.ibatis.BaseDataTest;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import org.apache.ibatis.BaseDataTest;
 import org.junit.Before;
 import org.junit.Test;
 

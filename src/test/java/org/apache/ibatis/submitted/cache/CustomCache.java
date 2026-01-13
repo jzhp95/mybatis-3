@@ -15,9 +15,9 @@
  */
 package org.apache.ibatis.submitted.cache;
 
-import org.apache.ibatis.cache.impl.PerpetualCache;
-
 import java.util.Date;
+
+import org.apache.ibatis.cache.impl.PerpetualCache;
 
 public class CustomCache extends PerpetualCache {
 

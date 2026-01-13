@@ -15,6 +15,9 @@
  */
 package org.apache.ibatis.submitted.foreach;
 
+import static com.googlecode.catchexception.apis.BDDCatchException.*;
+import static org.assertj.core.api.BDDAssertions.then;
+
 import java.io.Reader;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -30,9 +33,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static com.googlecode.catchexception.apis.BDDCatchException.*;
-import static org.assertj.core.api.BDDAssertions.then;
 
 public class ForEachTest {
 

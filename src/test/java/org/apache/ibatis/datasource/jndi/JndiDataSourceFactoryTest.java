@@ -15,22 +15,24 @@
  */
 package org.apache.ibatis.datasource.jndi;
 
-import org.apache.ibatis.BaseDataTest;
-import org.apache.ibatis.datasource.DataSourceException;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
+
+import org.apache.ibatis.BaseDataTest;
+import org.apache.ibatis.datasource.DataSourceException;
+import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JndiDataSourceFactoryTest extends BaseDataTest {
 

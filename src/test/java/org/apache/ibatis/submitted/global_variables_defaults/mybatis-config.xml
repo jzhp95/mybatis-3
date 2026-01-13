@@ -21,7 +21,7 @@
     "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-	
+
 	<settings>
 		<setting name="jdbcTypeForNull" value="${settings.jdbcTypeForNull:NULL}"/>
 	</settings>
@@ -40,7 +40,7 @@
 			</dataSource>
 		</environment>
 	</environments>
-	
+
 	<databaseIdProvider type="DB_VENDOR">
 		<property name="${productName.hsql:HSQL Database Engine}" value="hsql"/>
 	</databaseIdProvider>

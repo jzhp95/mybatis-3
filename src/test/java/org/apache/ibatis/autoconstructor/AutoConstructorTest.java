@@ -15,6 +15,10 @@
  */
 package org.apache.ibatis.autoconstructor;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.util.List;
+
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -25,10 +29,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.util.List;
 
 public class AutoConstructorTest {
   private static SqlSessionFactory sqlSessionFactory;

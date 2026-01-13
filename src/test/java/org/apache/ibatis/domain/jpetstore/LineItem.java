@@ -18,7 +18,6 @@ package org.apache.ibatis.domain.jpetstore;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-
 public class LineItem implements Serializable {
 
   private static final long serialVersionUID = 1L;

@@ -74,7 +74,7 @@
   </objectFactory>
 
   <objectWrapperFactory type="org.apache.ibatis.builder.CustomObjectWrapperFactory" />
-  
+
   <reflectorFactory type="org.apache.ibatis.builder.CustomReflectorFactory"/>
 
   <plugins>
@@ -96,7 +96,7 @@
       </dataSource>
     </environment>
   </environments>
-  
+
   <databaseIdProvider type="DB_VENDOR">
     <property name="Apache Derby" value="derby"/>
   </databaseIdProvider>

@@ -274,7 +274,7 @@ public class SqlProviderTest {
       sqlSession.close();
     }
   }
-  
+
   @Test
   public void methodNotFound() throws NoSuchMethodException {
     try {

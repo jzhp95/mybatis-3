@@ -15,12 +15,12 @@
  */
 package org.apache.ibatis.submitted.sqlprovider;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.jdbc.SQL;
-
-import java.util.List;
-import java.util.Map;
 
 public class OurSqlBuilder {
 

@@ -42,7 +42,7 @@ public interface TransactionFactory {
    * @since 3.1.0
    */
   Transaction newTransaction(Connection conn);
-  
+
   /**
    * Creates a {@link Transaction} out of a datasource.
    * @param dataSource DataSource to take the connection from

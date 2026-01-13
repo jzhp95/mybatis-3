@@ -17,18 +17,15 @@ package org.apache.ibatis.cache;
 
 import static org.junit.Assert.*;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Date;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class CacheKeyTest {
 

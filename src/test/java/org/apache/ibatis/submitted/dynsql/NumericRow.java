@@ -18,7 +18,6 @@ package org.apache.ibatis.submitted.dynsql;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 public class NumericRow {
     private Integer id;
     private Byte tinynumber;

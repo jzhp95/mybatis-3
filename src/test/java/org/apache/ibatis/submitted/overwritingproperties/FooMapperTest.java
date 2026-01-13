@@ -15,14 +15,14 @@
  */
 package org.apache.ibatis.submitted.overwritingproperties;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.*;
 import org.junit.*;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /*
  * @author jjensen
@@ -65,7 +65,7 @@ public class FooMapperTest {
     mapper.insertFoo(inserted);
 
     final Foo selected = mapper.selectFoo();
-    
+
     // field1 is explicitly mapped properly
     // <result property="field1" column="field1" jdbcType="INTEGER"/>
     Assert.assertEquals(inserted.getField1(), selected.getField1());

@@ -55,7 +55,7 @@ public class Person {
   public Collection<Item> getItems() {
     return items;
   }
-  
+
   public boolean owns(String name) {
     for (Item item : getItems()) {
       if (item.getName().equals(name))

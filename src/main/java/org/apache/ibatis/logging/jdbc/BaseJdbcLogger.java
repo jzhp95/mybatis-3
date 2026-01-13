@@ -31,7 +31,7 @@ import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
  * Base class for proxies to do logging
- * 
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  */

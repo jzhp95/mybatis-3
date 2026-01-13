@@ -100,7 +100,7 @@ public class CustomObjectFactory implements ObjectFactory {
         }
         return classToCreate;
     }
-    
+
     @Override
     public <T> boolean isCollection(Class<T> type) {
       return CustomCollection.class.isAssignableFrom(type);

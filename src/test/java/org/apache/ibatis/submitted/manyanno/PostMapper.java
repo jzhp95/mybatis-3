@@ -15,9 +15,9 @@
  */
 package org.apache.ibatis.submitted.manyanno;
 
-import org.apache.ibatis.annotations.*;
-
 import java.util.List;
+
+import org.apache.ibatis.annotations.*;
 
 public interface PostMapper {
 

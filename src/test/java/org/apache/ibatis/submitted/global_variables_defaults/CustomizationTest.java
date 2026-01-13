@@ -15,6 +15,10 @@
  */
 package org.apache.ibatis.submitted.global_variables_defaults;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Properties;
+
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Property;
@@ -29,10 +33,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.type.JdbcType;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Properties;
 
 public class CustomizationTest {
 

@@ -15,17 +15,17 @@
  */
 package org.apache.ibatis.mapping;
 
+import static com.googlecode.catchexception.apis.BDDCatchException.*;
+import static org.assertj.core.api.BDDAssertions.then;
+
+import java.lang.reflect.Field;
+
 import org.apache.ibatis.builder.InitializingObject;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-
-import static com.googlecode.catchexception.apis.BDDCatchException.*;
-import static org.assertj.core.api.BDDAssertions.then;
 
 public class CacheBuilderTest {
 

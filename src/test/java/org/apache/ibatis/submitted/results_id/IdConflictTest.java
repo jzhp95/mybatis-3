@@ -15,11 +15,11 @@
  */
 package org.apache.ibatis.submitted.results_id;
 
-import org.apache.ibatis.session.Configuration;
-import org.junit.Test;
-
 import static com.googlecode.catchexception.apis.BDDCatchException.*;
 import static org.assertj.core.api.BDDAssertions.then;
+
+import org.apache.ibatis.session.Configuration;
+import org.junit.Test;
 
 public class IdConflictTest {
 

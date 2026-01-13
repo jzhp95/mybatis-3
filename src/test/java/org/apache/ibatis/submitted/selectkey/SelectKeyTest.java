@@ -15,24 +15,23 @@
  */
 package org.apache.ibatis.submitted.selectkey;
 
-import org.apache.ibatis.exceptions.PersistenceException;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.jdbc.ScriptRunner;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-
 import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.ibatis.exceptions.PersistenceException;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.jdbc.ScriptRunner;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class SelectKeyTest {
 
@@ -183,7 +182,7 @@ public class SelectKeyTest {
         assertEquals(1, rows);
         assertEquals(22, name.getNameId());
         assertEquals("barney_fred", name.getGeneratedName());
-        
+
         name.setName("Wilma");
         rows = mapper.updateTable2WithGeneratedKey(name);
         assertEquals(1, rows);
@@ -207,7 +206,7 @@ public class SelectKeyTest {
         assertEquals(1, rows);
         assertEquals(22, name.getNameId());
         assertEquals("barney_fred", name.getGeneratedName());
-        
+
         name.setName("Wilma");
         rows = mapper.updateTable2WithGeneratedKeyXml(name);
         assertEquals(1, rows);
@@ -264,7 +263,7 @@ public class SelectKeyTest {
         assertEquals(1, rows);
         assertEquals(22, name.getNameId());
         assertEquals("barney_fred", name.getGeneratedName());
-        
+
         name.setName("Wilma");
         rows = mapper.updateTable2WithSelectKeyWithKeyMap(name);
         assertEquals(1, rows);

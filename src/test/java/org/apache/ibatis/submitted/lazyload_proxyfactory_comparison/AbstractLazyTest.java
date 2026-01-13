@@ -31,7 +31,7 @@ import org.junit.Test;
 public abstract class AbstractLazyTest {
 
   private SqlSessionFactory sqlSessionFactory;
-  private SqlSession sqlSession; 
+  private SqlSession sqlSession;
   private Mapper mapper;
 
   protected abstract String getConfiguration();
@@ -58,7 +58,7 @@ public abstract class AbstractLazyTest {
     mapper = sqlSession.getMapper(Mapper.class);
   }
 
-  @After 
+  @After
   public void after() {
     if (sqlSession != null) {
       sqlSession.close();

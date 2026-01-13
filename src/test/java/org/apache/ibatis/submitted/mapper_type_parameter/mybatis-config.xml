@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
        Copyright 2009-2016 the original author or authors.
@@ -32,11 +32,11 @@
 			</dataSource>
 		</environment>
 	</environments>
-	
+
 	<mappers>
 		<mapper class="org.apache.ibatis.submitted.mapper_type_parameter.CountryMapper" />
 		<mapper class="org.apache.ibatis.submitted.mapper_type_parameter.PersonMapper" />
 		<mapper class="org.apache.ibatis.submitted.mapper_type_parameter.PersonListMapper" />
 	</mappers>
 
-</configuration> 
+</configuration>

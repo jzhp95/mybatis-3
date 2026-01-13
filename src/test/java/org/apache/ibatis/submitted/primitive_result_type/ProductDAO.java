@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.submitted.primitive_result_type;
 
-import org.apache.ibatis.session.SqlSession;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
 
 public class ProductDAO {
 

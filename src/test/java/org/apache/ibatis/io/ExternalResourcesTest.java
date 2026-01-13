@@ -15,16 +15,16 @@
  */
 package org.apache.ibatis.io;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
-
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExternalResourcesTest {
 

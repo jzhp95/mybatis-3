@@ -45,11 +45,11 @@ public interface ObjectWrapper {
   boolean hasGetter(String name);
 
   MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory);
-  
+
   boolean isCollection();
-  
+
   void add(Object element);
-  
+
   <E> void addAll(List<E> element);
 
 }

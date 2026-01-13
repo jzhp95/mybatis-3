@@ -31,7 +31,7 @@ import org.junit.Test;
 public class SerializeCircularTest {
 
   @Test
-  public void serializeAndDeserializeObjectsWithAggressiveLazyLoadingWithoutPreloadingAttribute() 
+  public void serializeAndDeserializeObjectsWithAggressiveLazyLoadingWithoutPreloadingAttribute()
   throws Exception {
     SqlSession sqlSession = createSessionWithAggressiveLazyLoading();
     try {
@@ -40,9 +40,9 @@ public class SerializeCircularTest {
         sqlSession.close();
       }
   }
-  
+
   @Test
-  public void serializeAndDeserializeObjectsWithAggressiveLazyLoadingWithPreloadingAttribute() 
+  public void serializeAndDeserializeObjectsWithAggressiveLazyLoadingWithPreloadingAttribute()
   throws Exception {
     SqlSession sqlSession = createSessionWithAggressiveLazyLoading();
     try {
@@ -54,7 +54,7 @@ public class SerializeCircularTest {
 
 //  @Ignore("See http://code.google.com/p/mybatis/issues/detail?id=614")
   @Test
-  public void serializeAndDeserializeObjectsWithoutAggressiveLazyLoadingWithoutPreloadingAttribute() 
+  public void serializeAndDeserializeObjectsWithoutAggressiveLazyLoadingWithoutPreloadingAttribute()
   throws Exception {
     SqlSession sqlSession = createSessionWithoutAggressiveLazyLoading();
     try {
@@ -66,7 +66,7 @@ public class SerializeCircularTest {
   }
 
   @Test
-  public void serializeAndDeserializeObjectsWithoutAggressiveLazyLoadingWithPreloadingAttribute() 
+  public void serializeAndDeserializeObjectsWithoutAggressiveLazyLoadingWithPreloadingAttribute()
   throws Exception {
     SqlSession sqlSession = createSessionWithoutAggressiveLazyLoading();
     try {

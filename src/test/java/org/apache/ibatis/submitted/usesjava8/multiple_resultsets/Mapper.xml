@@ -34,7 +34,7 @@
   </select>
 
 	<resultMap type="org.apache.ibatis.submitted.usesjava8.multiple_resultsets.OrderDetail" id="usersResult" />
-	
+
 	<resultMap type="org.apache.ibatis.submitted.usesjava8.multiple_resultsets.OrderHeader" id="groupsResult" />
-	
+
 </mapper>

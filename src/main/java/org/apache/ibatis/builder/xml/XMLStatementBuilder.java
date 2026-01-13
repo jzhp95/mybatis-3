@@ -62,12 +62,12 @@ public class XMLStatementBuilder extends BaseBuilder {
         // 获取语句的唯一标识符和数据库标识符
         String id = context.getStringAttribute("id");
         String databaseId = context.getStringAttribute("databaseId");
-    
+
         // 检查数据库标识符是否匹配当前环境，不匹配则跳过解析
         if (!databaseIdMatchesCurrent(id, databaseId, this.requiredDatabaseId)) {
             return;
         }
-    
+
         // 提取基础配置属性
         Integer fetchSize = context.getIntAttribute("fetchSize");
         Integer timeout = context.getIntAttribute("timeout");
@@ -78,46 +78,46 @@ public class XMLStatementBuilder extends BaseBuilder {
         String resultType = context.getStringAttribute("resultType");
         String lang = context.getStringAttribute("lang");
         LanguageDriver langDriver = getLanguageDriver(lang);
-    
+
         // 解析结果类型和结果集类型配置
         Class<?> resultTypeClass = resolveClass(resultType);
         String resultSetType = context.getStringAttribute("resultSetType");
         StatementType statementType = StatementType.valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));
         ResultSetType resultSetTypeEnum = resolveResultSetType(resultSetType);
-    
+
         // 根据节点名称确定 SQL 命令类型（select/insert/update/delete）
         String nodeName = context.getNode().getNodeName();
         SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
         boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
-        
+
         // 设置默认的缓存策略：SELECT 操作使用缓存，其他操作刷新缓存
         boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
         boolean useCache = context.getBooleanAttribute("useCache", isSelect);
         boolean resultOrdered = context.getBooleanAttribute("resultOrdered", false);
-    
+
         // Include Fragments before parsing
         // 处理 <include> 标签，将引用的 SQL 片段包含到当前语句中
         XMLIncludeTransformer includeParser = new XMLIncludeTransformer(configuration, builderAssistant);
         includeParser.applyIncludes(context.getNode());
-    
+
         // Parse selectKey after includes and remove them.
         // 处理 <selectKey> 标签（用于主键生成），处理完成后从 XML 中移除
         processSelectKeyNodes(id, parameterTypeClass, langDriver);
-    
+
         // Parse the SQL (pre: <selectKey> and <include> were parsed and removed)
         // 解析 SQL 语句（此时 <selectKey> 和 <include> 已被处理并移除）
         SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
-        
+
         // 提取多结果集配置和主键相关属性
         String resultSets = context.getStringAttribute("resultSets");
         String keyProperty = context.getStringAttribute("keyProperty");
         String keyColumn = context.getStringAttribute("keyColumn");
-        
+
         // 处理主键生成器配置
         KeyGenerator keyGenerator;
         String keyStatementId = id + SelectKeyGenerator.SELECT_KEY_SUFFIX;
         keyStatementId = builderAssistant.applyCurrentNamespace(keyStatementId, true);
-        
+
         // 如果已存在对应的 selectKey 语句，则使用其生成器
         if (configuration.hasKeyGenerator(keyStatementId)) {
             keyGenerator = configuration.getKeyGenerator(keyStatementId);
@@ -127,7 +127,7 @@ public class XMLStatementBuilder extends BaseBuilder {
                     configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
                     ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
         }
-    
+
         // 构建并添加 MappedStatement 到配置中
         builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
                 fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,

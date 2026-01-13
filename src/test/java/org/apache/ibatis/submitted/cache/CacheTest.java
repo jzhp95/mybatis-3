@@ -15,16 +15,19 @@
  */
 package org.apache.ibatis.submitted.cache;
 
+import static com.googlecode.catchexception.apis.BDDCatchException.*;
+import static org.assertj.core.api.BDDAssertions.then;
+
 import java.io.Reader;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 
 import org.apache.ibatis.annotations.CacheNamespace;
+import org.apache.ibatis.annotations.CacheNamespaceRef;
 import org.apache.ibatis.annotations.Property;
+import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
-import org.apache.ibatis.annotations.CacheNamespaceRef;
-import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
@@ -33,9 +36,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static com.googlecode.catchexception.apis.BDDCatchException.*;
-import static org.assertj.core.api.BDDAssertions.then;
 
 // issue #524
 public class CacheTest {
@@ -62,7 +62,7 @@ public class CacheTest {
   }
 
   /*
-   * Test Plan: 
+   * Test Plan:
    *  1) SqlSession 1 executes "select * from A".
    *  2) SqlSession 1 closes.
    *  3) SqlSession 2 executes "delete from A where id = 1"
@@ -93,7 +93,7 @@ public class CacheTest {
   }
 
   /*
-   * Test Plan: 
+   * Test Plan:
    *  1) SqlSession 1 executes "select * from A".
    *  2) SqlSession 1 closes.
    *  3) SqlSession 2 executes "delete from A where id = 1"
@@ -102,7 +102,7 @@ public class CacheTest {
    *  6) SqlSession 3 executes "select * from A"
    *
    * Assert:
-   *   Step 6 returns 2 rows. 
+   *   Step 6 returns 2 rows.
    */
   @Test
   public void testplan2() {
@@ -142,7 +142,7 @@ public class CacheTest {
    *  6) SqlSession 3 closes.
    *
    * Assert:
-   *   Step 6 returns 1 row. 
+   *   Step 6 returns 1 row.
    */
   @Test
   public void testplan3() {

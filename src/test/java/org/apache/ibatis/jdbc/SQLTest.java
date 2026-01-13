@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.jdbc;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class SQLTest {
 

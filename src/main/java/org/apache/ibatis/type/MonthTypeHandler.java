@@ -30,7 +30,7 @@ import org.apache.ibatis.lang.UsesJava8;
  */
 @UsesJava8
 public class MonthTypeHandler extends BaseTypeHandler<Month> {
-    
+
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Month month, JdbcType type) throws SQLException {
         ps.setInt(i, month.getValue());
@@ -53,5 +53,5 @@ public class MonthTypeHandler extends BaseTypeHandler<Month> {
         int month = cs.getInt(columnIndex);
         return month == 0 ? null : Month.of(month);
     }
-    
+
 }

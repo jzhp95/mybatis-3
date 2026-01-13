@@ -15,10 +15,10 @@
  */
 package org.apache.ibatis.parsing;
 
+import java.util.Properties;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import java.util.Properties;
 
 public class PropertyParserTest {
 
