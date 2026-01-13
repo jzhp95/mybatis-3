@@ -58,18 +58,27 @@ public class MapperRegistry {
   }
 
   public <T> void addMapper(Class<T> type) {
+    // 得是一个接口
     if (type.isInterface()) {
+      // 已经注册了就抛出异常 重复注册
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
       }
+
       boolean loadCompleted = false;
       try {
+        // 最终结果就是  每个 mapper 文件注册一个 MapperProxyFactory
+        // 每个 mapper 文件的 sql 语句解析完注册一个 MappedStatement
+
+        // 把当前的 class 封装为一个 MapperProxyFactory 并注册到 knownMappers 中
         knownMappers.put(type, new MapperProxyFactory<T>(type));
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
         parser.parse();
+
+
         loadCompleted = true;
       } finally {
         if (!loadCompleted) {
@@ -90,9 +99,13 @@ public class MapperRegistry {
    * @since 3.2.2
    */
   public void addMappers(String packageName, Class<?> superType) {
+    // 创建一个反射工具类
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
+    // 扫描包下的所有.class文件，筛选出符合条件的，放入到 matches 中
     resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
     Set<Class<? extends Class<?>>> mapperSet = resolverUtil.getClasses();
+
+    // 挨个 Class 进行注册
     for (Class<?> mapperClass : mapperSet) {
       addMapper(mapperClass);
     }
