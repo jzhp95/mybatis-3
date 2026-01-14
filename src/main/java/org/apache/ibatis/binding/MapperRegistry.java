@@ -74,6 +74,7 @@ public class MapperRegistry {
 
                 // 把当前的 class 封装为一个 MapperProxyFactory 并注册到 knownMappers 中
                 knownMappers.put(type, new MapperProxyFactory<T>(type));
+
                 // It's important that the type is added before the parser is run
                 // otherwise the binding may automatically be attempted by the
                 // mapper parser. If the type is already known, it won't try.

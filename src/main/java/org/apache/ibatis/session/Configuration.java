@@ -557,8 +557,37 @@ public class Configuration {
         return resultSetHandler;
     }
 
+    /**
+     * 创建一个新的StatementHandler实例。
+     * <p>
+     * StatementHandler是MyBatis中负责处理JDBC Statement的核心组件，
+     * 它封装了SQL语句的执行、参数设置和结果映射等功能。
+     * <p>
+     * 该方法执行以下步骤：
+     * 1. 根据MappedStatement中指定的StatementType创建相应的RoutingStatementHandler
+     * - STATEMENT: 创建SimpleStatementHandler，处理普通SQL语句
+     * - PREPARED: 创建PreparedStatementHandler，处理预编译SQL语句
+     * - CALLABLE: 创建CallableStatementHandler，处理存储过程调用
+     * 2. 将创建的StatementHandler通过拦截器链进行层层包装，实现插件功能
+     * 3. 返回经过拦截器处理后的StatementHandler实例
+     * <p>
+     * 这种设计使得MyBatis可以在StatementHandler执行前后插入自定义逻辑，
+     * 如SQL改写、性能监控、权限检查等，是MyBatis插件机制的核心实现点。
+     *
+     * @param executor        执行器实例，负责执行SQL语句
+     * @param mappedStatement 映射语句，包含SQL语句、输入输出映射等信息
+     * @param parameterObject 参数对象，包含SQL执行所需的参数
+     * @param rowBounds       行边界，用于分页查询
+     * @param resultHandler   结果处理器，用于处理查询结果
+     * @param boundSql        绑定SQL，包含解析后的SQL语句和参数映射
+     * @return 经过拦截器链处理后的StatementHandler实例
+     * @see RoutingStatementHandler
+     * @see InterceptorChain#pluginAll(Object)
+     */
     public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+        // 创建路由StatementHandler，根据MappedStatement中的StatementType决定具体实现
         StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
+        // 应用所有已注册的拦截器，对StatementHandler进行层层包装
         statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
         return statementHandler;
     }
@@ -608,6 +637,7 @@ public class Configuration {
         }
 
         // 如果开启了缓存功能，包装一层缓存执行器
+        // 此处为  二级缓存！！！
         if (cacheEnabled) {
             executor = new CachingExecutor(executor);
         }
@@ -633,10 +663,33 @@ public class Configuration {
         return keyGenerators.get(id);
     }
 
+    /**
+     * 检查是否存在指定 ID 的键生成器。
+     * <p>
+     * 该方法用于判断配置中是否已注册指定 ID 的键生成器。
+     * 键生成器通常用于在插入操作中自动生成主键值。
+     *
+     * @param id 键生成器的唯一标识符
+     * @return 如果存在指定 ID 的键生成器，则返回 true；否则返回 false
+     */
     public boolean hasKeyGenerator(String id) {
         return keyGenerators.containsKey(id);
     }
 
+    /**
+     * 添加一个缓存实例到配置中。
+     * <p>
+     * 该方法用于将一个缓存实例注册到 MyBatis 配置中，
+     * 以便在执行查询时可以使用该缓存来存储和检索结果。
+     * 缓存实例通常是实现了 {@link Cache} 接口的类的实例，
+     * 例如 {@link PerpetualCache} 或 {@link SerializedCache}。
+     * <p>
+     * 缓存实例的 ID 必须是唯一的，
+     * 否则会覆盖已存在的缓存实例。
+     *
+     * @param cache 要添加的缓存实例
+     * @throws IllegalArgumentException 如果缓存实例的 ID 为 null
+     */
     public void addCache(Cache cache) {
         caches.put(cache.getId(), cache);
     }

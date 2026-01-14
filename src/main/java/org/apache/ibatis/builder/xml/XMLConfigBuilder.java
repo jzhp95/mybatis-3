@@ -412,31 +412,86 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * 解析配置文件中的 mappers 元素，注册映射器
+     * 
+     * 该方法负责处理 MyBatis 配置文件中的 <mappers> 配置，支持四种方式注册映射器：
+     * 1. 通过 package 批量注册指定包下的所有 Mapper 接口
+     * 2. 通过 resource 指定 XML 映射文件路径注册映射器
+     * 3. 通过 url 指定 XML 映射文件 URL 路径注册映射器
+     * 4. 通过 class 指定 Mapper 接口类名注册映射器
+     * 
+     * @param parent mappers 节点的父节点，包含所有 mapper 子节点
+     * @throws Exception 如果解析过程中发生异常，如资源找不到、类加载失败等
+     * 
+     * 执行流程：
+     * 1. 遍历 mappers 节点下的所有子节点
+     * 2. 对于 package 节点，扫描指定包下的所有 Mapper 接口进行注册
+     * 3. 对于 mapper 节点，根据配置的资源类型进行不同处理：
+     *    - resource：从类路径加载 XML 映射文件并解析
+     *    - url：从 URL 加载 XML 映射文件并解析
+     *    - class：加载指定的 Mapper 接口类并注册
+     * 4. 验证配置合法性，确保只指定一种资源类型
+     * 
+     * 设计说明：
+     * - 使用策略模式处理不同类型的映射器注册方式
+     * - XML 映射文件通过 XMLMapperBuilder 解析，支持完整的映射配置
+     * - 接口方式注册只适用于注解驱动的映射器
+     * - 错误上下文设置有助于精确定位配置问题
+     * 
+     * 配置示例：
+     * <mappers>
+     *   <package name="com.example.mapper"/>
+     *   <mapper resource="mapper/UserMapper.xml"/>
+     *   <mapper url="file:///var/mappers/OrderMapper.xml"/>
+     *   <mapper class="com.example.mapper.ProductMapper"/>
+     * </mappers>
+     */
     private void mapperElement(XNode parent) throws Exception {
         if (parent != null) {
+            // 遍历 mappers 节点下的所有子节点
             for (XNode child : parent.getChildren()) {
+                // 处理 package 方式注册映射器（批量注册）
                 if ("package".equals(child.getName())) {
+                    // 获取包名
                     String mapperPackage = child.getStringAttribute("name");
                     // 扫描包下面的所有Mapper接口进行注册
                     configuration.addMappers(mapperPackage);
                 } else {
+                    // 处理单个 mapper 节点，支持三种资源类型
                     String resource = child.getStringAttribute("resource");
                     String url = child.getStringAttribute("url");
                     String mapperClass = child.getStringAttribute("class");
+                    
+                    // 处理 resource 方式：从类路径加载 XML 映射文件
                     if (resource != null && url == null && mapperClass == null) {
+                        // 设置错误上下文，便于定位问题
                         ErrorContext.instance().resource(resource);
+                        // 从类路径加载 XML 映射文件
                         InputStream inputStream = Resources.getResourceAsStream(resource);
+                        // 创建 XML 映射文件构建器并解析
                         XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
                         mapperParser.parse();
-                    } else if (resource == null && url != null && mapperClass == null) {
+                    } 
+                    // 处理 url 方式：从 URL 加载 XML 映射文件
+                    else if (resource == null && url != null && mapperClass == null) {
+                        // 设置错误上下文，便于定位问题
                         ErrorContext.instance().resource(url);
+                        // 从 URL 加载 XML 映射文件
                         InputStream inputStream = Resources.getUrlAsStream(url);
+                        // 创建 XML 映射文件构建器并解析
                         XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
                         mapperParser.parse();
-                    } else if (resource == null && url == null && mapperClass != null) {
+                    } 
+                    // 处理 class 方式：直接注册 Mapper 接口类
+                    else if (resource == null && url == null && mapperClass != null) {
+                        // 加载 Mapper 接口类
                         Class<?> mapperInterface = Resources.classForName(mapperClass);
+                        // 注册 Mapper 接口
                         configuration.addMapper(mapperInterface);
-                    } else {
+                    } 
+                    // 配置错误：同时指定了多种资源类型
+                    else {
                         throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
                     }
                 }
