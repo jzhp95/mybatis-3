@@ -54,9 +54,43 @@ public class XMLStatementBuilder extends BaseBuilder {
     }
 
     /**
-     * 解析 XML 映射文件中的 SQL 语句节点，构建 MappedStatement
-     * 该方法负责从 XML 节点中提取 SQL 语句配置信息，包括参数映射、结果映射、缓存策略等
+     * 解析XML映射文件中的SQL语句节点，构建MappedStatement对象
+     *
+     * <p>该方法负责从XML节点中提取SQL语句配置信息，包括参数映射、结果映射、缓存策略等，
+     * 最终构建完整的MappedStatement对象并添加到Configuration中。这是MyBatis映射文件解析的核心方法之一。</p>
+     *
+     * <p>执行流程：</p>
+     * <ol>
+     *   <li>获取语句ID和数据库ID，验证数据库ID是否匹配当前环境</li>
+     *   <li>提取基础配置属性（fetchSize、timeout、parameterMap等）</li>
+     *   <li>解析参数类型和结果类型配置</li>
+     *   <li>根据节点名称确定SQL命令类型（select/insert/update/delete）</li>
+     *   <li>设置默认缓存策略（SELECT操作使用缓存，其他操作刷新缓存）</li>
+     *   <li>处理&lt;include&gt;标签，将引用的SQL片段包含到当前语句中</li>
+     *   <li>处理&lt;selectKey&gt;标签（用于主键生成），处理完成后从XML中移除</li>
+     *   <li>解析SQL语句，创建SqlSource对象</li>
+     *   <li>提取多结果集配置和主键相关属性</li>
+     *   <li>处理主键生成器配置</li>
+     *   <li>构建并添加MappedStatement到配置中</li>
+     * </ol>
      * 解析顺序：基础属性 → 包含处理 → selectKey 处理 → SQL 解析 → MappedStatement 构建
+     * <p>注意事项：</p>
+     * <ul>
+     *   <li>当数据库ID不匹配当前环境时，会跳过该语句的解析</li>
+     *   <li>resultMap和resultType属性通常只需指定一个，同时指定时resultMap优先</li>
+     *   <li>SELECT语句默认启用缓存，其他语句默认刷新缓存</li>
+     *   <li>主键生成器可通过useGeneratedKeys属性或&lt;selectKey&gt;标签配置</li>
+     *   <li>该方法支持MyBatis的多数据库特性，允许在同一映射文件中定义不同数据库的SQL语句</li>
+     * </ul>
+     *
+     * @see MappedStatement SQL语句映射对象
+     * @see SqlSource SQL源接口
+     * @see SqlCommandType SQL命令类型枚举
+     * @see StatementType 语句类型枚举
+     * @see ResultSetType 结果集类型枚举
+     * @see LanguageDriver 语言驱动接口
+     * @see KeyGenerator 主键生成器接口
+     * @see XMLIncludeTransformer XML包含转换器
      */
     public void parseStatementNode() {
         // 获取语句的唯一标识符和数据库标识符

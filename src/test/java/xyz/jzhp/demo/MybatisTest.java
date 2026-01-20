@@ -18,6 +18,7 @@ public class MybatisTest {
 
         // DefaultSqlSession -> Executor -> Transaction -> Connection
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+
             // 拿到的实际上是一个 JDK 动态代理对象，真正执行的是 MapperProxy 类的 invoke 方法
             PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
             Person person = personMapper.selectPersonById(1);

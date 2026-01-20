@@ -565,21 +565,21 @@ public class Configuration {
      * <p>
      * 该方法执行以下步骤：
      * 1. 根据MappedStatement中指定的StatementType创建相应的RoutingStatementHandler
-     * - STATEMENT: 创建SimpleStatementHandler，处理普通SQL语句
-     * - PREPARED: 创建PreparedStatementHandler，处理预编译SQL语句
-     * - CALLABLE: 创建CallableStatementHandler，处理存储过程调用
+     *    - STATEMENT: 创建SimpleStatementHandler，处理普通SQL语句
+     *    - PREPARED: 创建PreparedStatementHandler，处理预编译SQL语句
+     *    - CALLABLE: 创建CallableStatementHandler，处理存储过程调用
      * 2. 将创建的StatementHandler通过拦截器链进行层层包装，实现插件功能
      * 3. 返回经过拦截器处理后的StatementHandler实例
      * <p>
      * 这种设计使得MyBatis可以在StatementHandler执行前后插入自定义逻辑，
      * 如SQL改写、性能监控、权限检查等，是MyBatis插件机制的核心实现点。
      *
-     * @param executor        执行器实例，负责执行SQL语句
+     * @param executor 执行器实例，负责执行SQL语句
      * @param mappedStatement 映射语句，包含SQL语句、输入输出映射等信息
      * @param parameterObject 参数对象，包含SQL执行所需的参数
-     * @param rowBounds       行边界，用于分页查询
-     * @param resultHandler   结果处理器，用于处理查询结果
-     * @param boundSql        绑定SQL，包含解析后的SQL语句和参数映射
+     * @param rowBounds 行边界，用于分页查询
+     * @param resultHandler 结果处理器，用于处理查询结果
+     * @param boundSql 绑定SQL，包含解析后的SQL语句和参数映射
      * @return 经过拦截器链处理后的StatementHandler实例
      * @see RoutingStatementHandler
      * @see InterceptorChain#pluginAll(Object)
@@ -675,7 +675,6 @@ public class Configuration {
     public boolean hasKeyGenerator(String id) {
         return keyGenerators.containsKey(id);
     }
-
     /**
      * 添加一个缓存实例到配置中。
      * <p>

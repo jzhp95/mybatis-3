@@ -101,30 +101,94 @@ public class MapperAnnotationBuilder {
     private final MapperBuilderAssistant assistant;
     private final Class<?> type;
 
+    /**
+     * 创建映射器注解构建器实例
+     * <p>
+     * 该构造方法用于初始化映射器注解构建器，设置配置对象、映射器接口类型以及
+     * 预定义的SQL注解类型集合。构建器将使用这些信息来解析映射器接口上的注解，
+     * 并将其转换为MyBatis可执行的MappedStatement对象。
+     * </p>
+     * <p>
+     * 初始化过程：
+     * <ol>
+     *   <li>根据映射器接口类型创建资源标识符</li>
+     *   <li>创建MapperBuilderAssistant辅助对象</li>
+     *   <li>保存配置对象和映射器接口类型</li>
+     *   <li>初始化SQL注解类型集合（@Select、@Insert、@Update、@Delete）</li>
+     *   <li>初始化SQL提供者注解类型集合（@SelectProvider、@InsertProvider等）</li>
+     * </ol>
+     * </p>
+     *
+     * @param configuration MyBatis全局配置对象，包含所有配置信息
+     * @param type          要解析的映射器接口的Class对象
+     * @see MapperBuilderAssistant 用于辅助构建映射器的助手类
+     * @see Select 查询注解
+     * @see Insert 插入注解
+     * @see Update 更新注解
+     * @see Delete 删除注解
+     * @see SelectProvider 查询提供者注解
+     * @see InsertProvider 插入提供者注解
+     * @see UpdateProvider 更新提供者注解
+     * @see DeleteProvider 删除提供者注解
+     */
     public MapperAnnotationBuilder(Configuration configuration, Class<?> type) {
+        // 根据映射器接口类型创建资源标识符，将类名中的点替换为斜线，并添加.java后缀
         String resource = type.getName().replace('.', '/') + ".java (best guess)";
+        // 创建映射器构建助手对象，用于辅助构建映射器
         this.assistant = new MapperBuilderAssistant(configuration, resource);
+        // 保存MyBatis全局配置对象
         this.configuration = configuration;
+        // 保存要解析的映射器接口类型
         this.type = type;
 
-        sqlAnnotationTypes.add(Select.class);
-        sqlAnnotationTypes.add(Insert.class);
-        sqlAnnotationTypes.add(Update.class);
-        sqlAnnotationTypes.add(Delete.class);
+        // 初始化SQL注解类型集合，添加基本SQL操作注解
+        sqlAnnotationTypes.add(Select.class);   // 添加查询注解类型
+        sqlAnnotationTypes.add(Insert.class);   // 添加插入注解类型
+        sqlAnnotationTypes.add(Update.class);   // 添加更新注解类型
+        sqlAnnotationTypes.add(Delete.class);   // 添加删除注解类型
 
-        sqlProviderAnnotationTypes.add(SelectProvider.class);
-        sqlProviderAnnotationTypes.add(InsertProvider.class);
-        sqlProviderAnnotationTypes.add(UpdateProvider.class);
-        sqlProviderAnnotationTypes.add(DeleteProvider.class);
+        // 初始化SQL提供者注解类型集合，添加动态SQL提供者注解
+        sqlProviderAnnotationTypes.add(SelectProvider.class);    // 添加查询提供者注解类型
+        sqlProviderAnnotationTypes.add(InsertProvider.class);    // 添加插入提供者注解类型
+        sqlProviderAnnotationTypes.add(UpdateProvider.class);    // 添加更新提供者注解类型
+        sqlProviderAnnotationTypes.add(DeleteProvider.class);    // 添加删除提供者注解类型
     }
 
     /**
      * 解析 Mapper 接口的注解配置
+     * <p>
+     * 该方法负责解析映射器接口上的所有注解配置，包括XML映射文件、缓存配置、
+     * 方法注解等，并将这些配置转换为MyBatis内部的MappedStatement对象。
+     * 解析过程遵循特定顺序，确保配置的正确性和完整性。
+     * </p>
+     * <p>
      * 按照以下顺序解析：XML 资源 -> 缓存配置 -> 方法注解 -> 未完成方法
+     * </p>
+     * <p>
+     * 执行流程：
+     * <ol>
+     *   <li>检查映射器接口是否已解析，避免重复加载</li>
+     *   <li>加载对应的XML映射文件（如果存在）</li>
+     *   <li>标记资源为已加载状态</li>
+     *   <li>设置当前命名空间为映射器接口的全限定名</li>
+     *   <li>解析类级别的缓存配置（@CacheNamespace注解）</li>
+     *   <li>解析类级别的缓存引用配置（@CacheNamespaceRef注解）</li>
+     *   <li>遍历接口中的所有方法，解析方法上的SQL注解</li>
+     *   <li>处理解析过程中未完成的方法，解决循环依赖问题</li>
+     * </ol>
+     * </p>
+     * <p>
      * 确保每个 Mapper 接口只被解析一次，避免重复加载
+     * </p>
+     *
+     * @see #loadXmlResource() 加载XML映射文件的方法
+     * @see #parseCache() 解析缓存配置的方法
+     * @see #parseCacheRef() 解析缓存引用配置的方法
+     * @see #parseStatement(Method) 解析方法注解的方法
+     * @see #parsePendingMethods() 解析未完成方法的方法
      */
     public void parse() {
-        // 获取 Mapper 接口的资源标识符
+        // 获取 Mapper 接口的资源标识符，用于检查是否已加载
         String resource = type.toString();
 
         // 检查该资源是否已经被加载过，避免重复解析
@@ -132,10 +196,10 @@ public class MapperAnnotationBuilder {
             // 加载对应的 XML 映射文件（如果存在）
             loadXmlResource();
 
-            // 标记该资源为已加载状态
+            // 标记该资源为已加载状态，防止重复加载
             configuration.addLoadedResource(resource);
 
-            // 设置当前命名空间为 Mapper 接口的全限定名
+            // 设置当前命名空间为 Mapper 接口的全限定名，用于标识映射器
             assistant.setCurrentNamespace(type.getName());
 
             // 解析类级别的缓存配置（@CacheNamespace 注解）
@@ -144,7 +208,7 @@ public class MapperAnnotationBuilder {
             // 解析类级别的缓存引用配置（@CacheNamespaceRef 注解）
             parseCacheRef();
 
-            // 获取 Mapper 接口中的所有方法
+            // 获取 Mapper 接口中的所有方法，包括继承的方法
             Method[] methods = type.getMethods();
 
             // 遍历所有方法，解析方法上的 SQL 注解
@@ -182,36 +246,108 @@ public class MapperAnnotationBuilder {
         }
     }
 
+    /**
+     * 加载映射器接口对应的XML映射文件
+     * <p>
+     * 该方法用于加载与映射器接口同名的XML映射文件，并使用XMLMapperBuilder进行解析。
+     * 这是MyBatis混合使用注解和XML配置的关键机制，允许开发者在接口中使用注解定义简单SQL，
+     * 同时在XML文件中定义复杂SQL和高级映射配置。
+     * </p>
+     * <p>
+     * 执行流程：
+     * <ol>
+     *   <li>检查命名空间对应的资源是否已加载，避免重复加载</li>
+     *   <li>构建XML文件路径（将类全限定名中的点替换为斜线，并添加.xml后缀）</li>
+     *   <li>尝试从类路径加载XML文件资源</li>
+     *   <li>如果资源存在，创建XMLMapperBuilder并解析XML文件</li>
+     * </ol>
+     * </p>
+     * <p>
+     * 注意事项：
+     * <ul>
+     *   <li>XML文件是可选的，如果不存在则忽略，不会抛出异常</li>
+     *   <li>使用"namespace:"前缀标识资源，防止Spring等框架重复加载</li>
+     *   <li>XML文件解析失败会导致BuilderException异常</li>
+     *   <li>XML文件中的配置会覆盖注解中的同名配置</li>
+     * </ul>
+     * </p>
+     *
+     * @see XMLMapperBuilder XML映射文件构建器
+     * @see Resources#getResourceAsStream(ClassLoader, String) 资源加载工具方法
+     * @see Configuration#isResourceLoaded(String) 检查资源是否已加载
+     */
     private void loadXmlResource() {
-        // Spring may not know the real resource name so we check a flag
-        // to prevent loading again a resource twice
-        // this flag is set at XMLMapperBuilder#bindMapperForNamespace
+        // Spring可能不知道真实的资源名称，所以我们检查一个标志
+        // 来防止两次加载同一个资源
+        // 这个标志在XMLMapperBuilder#bindMapperForNamespace中设置
         if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
+            // 构建XML文件路径，将类全限定名中的点替换为斜线，并添加.xml后缀
             String xmlResource = type.getName().replace('.', '/') + ".xml";
+            // 初始化输入流为null
             InputStream inputStream = null;
             try {
+                // 尝试从类路径加载XML文件资源
                 inputStream = Resources.getResourceAsStream(type.getClassLoader(), xmlResource);
             } catch (IOException e) {
-                // ignore, resource is not required
+                // 忽略异常，资源不是必需的
             }
+            // 如果资源存在（输入流不为null）
             if (inputStream != null) {
 
-                // 加载解析 对应的 mapper.xml 文件，并且进行解析
+                // 加载解析对应的mapper.xml文件，并且进行解析
                 XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
+                // 解析XML映射文件
                 xmlParser.parse();
             }
         }
     }
 
+    /**
+     * 解析映射器接口上的缓存配置注解
+     * <p>
+     * 该方法用于解析映射器接口上的@CacheNamespace注解，提取缓存相关配置，
+     * 并根据这些配置创建二级缓存。缓存配置包括缓存实现类、淘汰策略、
+     * 刷新间隔、缓存大小、读写属性和阻塞属性等。
+     * </p>
+     * <p>
+     * 执行流程：
+     * <ol>
+     *   <li>获取映射器接口上的@CacheNamespace注解</li>
+     *   <li>如果注解存在，提取缓存配置参数</li>
+     *   <li>处理缓存大小和刷新间隔的默认值</li>
+     *   <li>转换注解属性为Properties对象</li>
+     *   <li>调用助手类创建新的缓存实例</li>
+     * </ol>
+     * </p>
+     * <p>
+     * 注意事项：
+     * <ul>
+     *   <li>如果映射器接口没有@CacheNamespace注解，则不创建缓存</li>
+     *   <li>缓存大小和刷新间隔为0时，使用默认值</li>
+     *   <li>属性配置支持变量替换</li>
+     * </ul>
+     * </p>
+     *
+     * @see CacheNamespace 缓存命名空间注解
+     * @see MapperBuilderAssistant#useNewCache(Class, Class, Long, Integer, boolean, boolean, Properties) 创建缓存的方法
+     * @see #convertToProperties(Property[]) 将注解属性转换为Properties对象的方法
+     */
     private void parseCache() {
+        // 获取映射器接口上的@CacheNamespace注解
         CacheNamespace cacheDomain = type.getAnnotation(CacheNamespace.class);
+        // 如果注解存在，则进行缓存配置解析
         if (cacheDomain != null) {
+            // 处理缓存大小，如果为0则使用默认值（null）
             Integer size = cacheDomain.size() == 0 ? null : cacheDomain.size();
+            // 处理缓存刷新间隔，如果为0则使用默认值（null）
             Long flushInterval = cacheDomain.flushInterval() == 0 ? null : cacheDomain.flushInterval();
+            // 将注解中的属性配置转换为Properties对象
             Properties props = convertToProperties(cacheDomain.properties());
+            // 调用助手类创建新的缓存实例，传入所有缓存配置参数
             assistant.useNewCache(cacheDomain.implementation(), cacheDomain.eviction(), flushInterval, size, cacheDomain.readWrite(), cacheDomain.blocking(), props);
         }
     }
+
 
     private Properties convertToProperties(Property[] properties) {
         if (properties.length == 0) {
@@ -219,24 +355,70 @@ public class MapperAnnotationBuilder {
         }
         Properties props = new Properties();
         for (Property property : properties) {
-            props.setProperty(property.name(),
-                    PropertyParser.parse(property.value(), configuration.getVariables()));
+            props.setProperty(property.name(), PropertyParser.parse(property.value(), configuration.getVariables()));
         }
         return props;
     }
 
+    /**
+     * 解析映射器接口上的缓存引用配置注解
+     * <p>
+     * 该方法用于处理@CacheNamespaceRef注解，允许当前映射器接口引用其他命名空间的缓存实现，
+     * 从而实现不同命名空间之间的缓存共享。这相当于XML配置中的&lt;cache-ref&gt;元素功能。
+     * </p>
+     * <p>
+     * 执行流程：
+     * <ol>
+     *   <li>获取映射器接口上的@CacheNamespaceRef注解</li>
+     *   <li>如果注解存在，提取value()和name()属性值</li>
+     *   <li>验证注解属性配置的有效性</li>
+     *   <li>根据属性值确定要引用的缓存命名空间</li>
+     *   <li>调用助手类的useCacheRef方法建立缓存引用关系</li>
+     * </ol>
+     * </p>
+     * <p>
+     * 注意事项：
+     * <ul>
+     *   <li>@CacheNamespaceRef注解必须指定value()或name()属性中的一个，但不能同时指定</li>
+     *   <li>value()属性用于指定引用缓存所在映射器接口的Class对象</li>
+     *   <li>name()属性用于直接指定引用缓存的命名空间字符串</li>
+     *   <li>如果引用的缓存不存在，将在后续处理中抛出IncompleteElementException</li>
+     * </ul>
+     * </p>
+     *
+     * @throws BuilderException 当@CacheNamespaceRef注解配置不当时抛出
+     * @see CacheNamespaceRef 缓存引用注解
+     * @see MapperBuilderAssistant#useCacheRef(String) 助手类中使用缓存引用的方法
+     */
     private void parseCacheRef() {
+        // 获取映射器接口上的@CacheNamespaceRef注解
         CacheNamespaceRef cacheDomainRef = type.getAnnotation(CacheNamespaceRef.class);
+
+        // 如果注解存在，则进行处理
         if (cacheDomainRef != null) {
+            // 获取注解中的value()属性，用于指定引用缓存所在映射器接口的Class对象
             Class<?> refType = cacheDomainRef.value();
+
+            // 获取注解中的name()属性，用于直接指定引用缓存的命名空间字符串
             String refName = cacheDomainRef.name();
+
+            // 验证注解配置：既没有指定value()也没有指定name()属性
             if (refType == void.class && refName.isEmpty()) {
+                // 抛出异常，提示必须指定value()或name()属性中的一个
                 throw new BuilderException("Should be specified either value() or name() attribute in the @CacheNamespaceRef");
             }
+
+            // 验证注解配置：同时指定了value()和name()属性
             if (refType != void.class && !refName.isEmpty()) {
+                // 抛出异常，提示不能同时指定value()和name()属性
                 throw new BuilderException("Cannot use both value() and name() attribute in the @CacheNamespaceRef");
             }
+
+            // 根据属性值确定要引用的缓存命名空间
+            // 如果指定了value()属性，使用其全限定类名作为命名空间；否则使用name()属性值
             String namespace = (refType != void.class) ? refType.getName() : refName;
+
+            // 调用助手类的useCacheRef方法，建立当前命名空间与指定缓存命名空间的引用关系
             assistant.useCacheRef(namespace);
         }
     }
@@ -296,9 +478,7 @@ public class MapperAnnotationBuilder {
             String column = discriminator.column();
             Class<?> javaType = discriminator.javaType() == void.class ? String.class : discriminator.javaType();
             JdbcType jdbcType = discriminator.jdbcType() == JdbcType.UNDEFINED ? null : discriminator.jdbcType();
-            @SuppressWarnings("unchecked")
-            Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
-                    (discriminator.typeHandler() == UnknownTypeHandler.class ? null : discriminator.typeHandler());
+            @SuppressWarnings("unchecked") Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>) (discriminator.typeHandler() == UnknownTypeHandler.class ? null : discriminator.typeHandler());
             Case[] cases = discriminator.cases();
             Map<String, String> discriminatorMap = new HashMap<String, String>();
             for (Case c : cases) {
@@ -413,29 +593,13 @@ public class MapperAnnotationBuilder {
             }
 
             // 构建并添加 MappedStatement 到配置中
-            assistant.addMappedStatement(
-                    mappedStatementId,
-                    sqlSource,
-                    statementType,
-                    sqlCommandType,
-                    fetchSize,
-                    timeout,
+            assistant.addMappedStatement(mappedStatementId, sqlSource, statementType, sqlCommandType, fetchSize, timeout,
                     // ParameterMapID - 已弃用，设为 null
-                    null,
-                    parameterTypeClass,
-                    resultMapId,
-                    getReturnType(method),
-                    resultSetType,
-                    flushCache,
-                    useCache,
+                    null, parameterTypeClass, resultMapId, getReturnType(method), resultSetType, flushCache, useCache,
                     // TODO gcode issue #577 - 延迟加载标志
-                    false,
-                    keyGenerator,
-                    keyProperty,
-                    keyColumn,
+                    false, keyGenerator, keyProperty, keyColumn,
                     // DatabaseID - 数据库标识符
-                    null,
-                    languageDriver,
+                    null, languageDriver,
                     // ResultSets - 多结果集配置
                     options != null ? nullOrEmpty(options.resultSets()) : null);
         }
@@ -595,24 +759,8 @@ public class MapperAnnotationBuilder {
             if (result.id()) {
                 flags.add(ResultFlag.ID);
             }
-            @SuppressWarnings("unchecked")
-            Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
-                    ((result.typeHandler() == UnknownTypeHandler.class) ? null : result.typeHandler());
-            ResultMapping resultMapping = assistant.buildResultMapping(
-                    resultType,
-                    nullOrEmpty(result.property()),
-                    nullOrEmpty(result.column()),
-                    result.javaType() == void.class ? null : result.javaType(),
-                    result.jdbcType() == JdbcType.UNDEFINED ? null : result.jdbcType(),
-                    hasNestedSelect(result) ? nestedSelectId(result) : null,
-                    null,
-                    null,
-                    null,
-                    typeHandler,
-                    flags,
-                    null,
-                    null,
-                    isLazy(result));
+            @SuppressWarnings("unchecked") Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>) ((result.typeHandler() == UnknownTypeHandler.class) ? null : result.typeHandler());
+            ResultMapping resultMapping = assistant.buildResultMapping(resultType, nullOrEmpty(result.property()), nullOrEmpty(result.column()), result.javaType() == void.class ? null : result.javaType(), result.jdbcType() == JdbcType.UNDEFINED ? null : result.jdbcType(), hasNestedSelect(result) ? nestedSelectId(result) : null, null, null, null, typeHandler, flags, null, null, isLazy(result));
             resultMappings.add(resultMapping);
         }
     }
@@ -652,24 +800,8 @@ public class MapperAnnotationBuilder {
             if (arg.id()) {
                 flags.add(ResultFlag.ID);
             }
-            @SuppressWarnings("unchecked")
-            Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
-                    (arg.typeHandler() == UnknownTypeHandler.class ? null : arg.typeHandler());
-            ResultMapping resultMapping = assistant.buildResultMapping(
-                    resultType,
-                    nullOrEmpty(arg.name()),
-                    nullOrEmpty(arg.column()),
-                    arg.javaType() == void.class ? null : arg.javaType(),
-                    arg.jdbcType() == JdbcType.UNDEFINED ? null : arg.jdbcType(),
-                    nullOrEmpty(arg.select()),
-                    nullOrEmpty(arg.resultMap()),
-                    null,
-                    null,
-                    typeHandler,
-                    flags,
-                    null,
-                    null,
-                    false);
+            @SuppressWarnings("unchecked") Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>) (arg.typeHandler() == UnknownTypeHandler.class ? null : arg.typeHandler());
+            ResultMapping resultMapping = assistant.buildResultMapping(resultType, nullOrEmpty(arg.name()), nullOrEmpty(arg.column()), arg.javaType() == void.class ? null : arg.javaType(), arg.jdbcType() == JdbcType.UNDEFINED ? null : arg.jdbcType(), nullOrEmpty(arg.select()), nullOrEmpty(arg.resultMap()), null, null, typeHandler, flags, null, null, false);
             resultMappings.add(resultMapping);
         }
     }
@@ -707,9 +839,7 @@ public class MapperAnnotationBuilder {
         SqlSource sqlSource = buildSqlSourceFromStrings(selectKeyAnnotation.statement(), parameterTypeClass, languageDriver);
         SqlCommandType sqlCommandType = SqlCommandType.SELECT;
 
-        assistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType, fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass, resultSetTypeEnum,
-                flushCache, useCache, false,
-                keyGenerator, keyProperty, keyColumn, null, languageDriver, null);
+        assistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType, fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass, resultSetTypeEnum, flushCache, useCache, false, keyGenerator, keyProperty, keyColumn, null, languageDriver, null);
 
         id = assistant.applyCurrentNamespace(id, false);
 

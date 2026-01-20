@@ -173,47 +173,118 @@ public class XMLMapperBuilder extends BaseBuilder {
             if (namespace == null || namespace.equals("")) {
                 throw new BuilderException("Mapper's namespace cannot be empty");
             }
+
             // 设置当前命名空间，作为后续所有配置的上下文
             builderAssistant.setCurrentNamespace(namespace);
 
             // 解析缓存引用配置，引用其他命名空间的缓存
             cacheRefElement(context.evalNode("cache-ref"));
+
             // 解析当前命名空间的缓存配置
             cacheElement(context.evalNode("cache"));
 
             // 解析参数映射配置（已废弃，推荐使用内联参数映射）
             parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+
             // 解析结果映射配置，定义结果集与对象属性的映射规则
             resultMapElements(context.evalNodes("/mapper/resultMap"));
 
             // 解析可重用的 SQL 片段，供后续 SQL 语句引用
             sqlElement(context.evalNodes("/mapper/sql"));
+
             // 解析具体的 SQL 语句（select/insert/update/delete），构建 MappedStatement
             buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
+
         } catch (Exception e) {
             // 将解析异常包装成 BuilderException，并包含资源位置信息，便于调试
             throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
         }
     }
 
+    /**
+     * 解析映射器XML文件中的SQL语句元素，支持数据库厂商特定语句解析
+     *
+     * <p>该方法负责处理XML中的各种SQL语句元素（如&lt;select&gt;、&lt;insert&gt;、&lt;update&gt;、&lt;delete&gt;等），
+     * 根据当前配置的数据库ID优先解析特定数据库厂商的语句，然后解析通用语句。</p>
+     *
+     * <p>执行流程：</p>
+     * <ol>
+     *   <li>检查配置中是否设置了数据库ID</li>
+     *   <li>如果设置了数据库ID，优先解析匹配该数据库ID的语句</li>
+     *   <li>解析通用语句（不指定数据库ID的语句）</li>
+     *   <li>对于每个语句节点，创建XMLStatementBuilder并尝试解析</li>
+     *   <li>处理解析失败的语句，将其添加到待处理列表中</li>
+     * </ol>
+     *
+     * <p>注意事项：</p>
+     * <ul>
+     *   <li>数据库ID用于区分不同数据库厂商的特定SQL语句</li>
+     *   <li>当存在多个数据库ID匹配的语句时，只会使用第一个匹配的语句</li>
+     *   <li>解析失败的语句会被添加到待处理列表，后续会重试解析</li>
+     *   <li>该方法支持MyBatis的多数据库特性，允许在同一映射文件中定义不同数据库的SQL语句</li>
+     * </ul>
+     *
+     * @param list SQL语句节点列表，包含所有需要解析的SQL语句元素
+     * @see XMLStatementBuilder 用于解析单个SQL语句的构建器
+     * @see Configuration#getDatabaseId() 获取当前配置的数据库ID
+     * @see Configuration#addIncompleteStatement(XMLStatementBuilder) 添加未完成的语句
+     */
     private void buildStatementFromContext(List<XNode> list) {
+        // 检查配置中是否设置了数据库ID
         if (configuration.getDatabaseId() != null) {
+            // 如果设置了数据库ID，优先解析匹配该数据库ID的语句
             buildStatementFromContext(list, configuration.getDatabaseId());
         }
 
+        // 解析通用语句（不指定数据库ID的语句）
         buildStatementFromContext(list, null);
     }
 
+
+    /**
+     * 解析映射器XML文件中的SQL语句元素，支持特定数据库厂商的语句解析
+     *
+     * <p>该方法负责处理XML中的各种SQL语句元素（如&lt;select&gt;、&lt;insert&gt;、&lt;update&gt;、&lt;delete&gt;等），
+     * 根据指定的数据库ID筛选并解析匹配的SQL语句。这是MyBatis支持多数据库厂商特性的核心实现之一。</p>
+     *
+     * <p>执行流程：</p>
+     * <ol>
+     *   <li>遍历SQL语句节点列表，处理每个语句元素</li>
+     *   <li>为每个语句节点创建XMLStatementBuilder实例，传入数据库ID参数</li>
+     *   <li>尝试解析语句节点，构建MappedStatement对象</li>
+     *   <li>处理解析失败的语句，将其添加到待处理列表中</li>
+     * </ol>
+     *
+     * <p>注意事项：</p>
+     * <ul>
+     *   <li>requiredDatabaseId参数用于筛选特定数据库厂商的SQL语句</li>
+     *   <li>当requiredDatabaseId为null时，解析所有不指定数据库ID的通用语句</li>
+     *   <li>解析失败的语句会被添加到待处理列表，后续会重试解析</li>
+     *   <li>每个语句节点只能被解析一次，重复解析会被忽略</li>
+     *   <li>该方法支持MyBatis的多数据库特性，允许在同一映射文件中定义不同数据库的SQL语句</li>
+     * </ul>
+     *
+     * @param list               SQL语句节点列表，包含所有需要解析的SQL语句元素
+     * @param requiredDatabaseId 需要匹配的数据库ID，为null时解析通用语句
+     * @see XMLStatementBuilder 用于解析单个SQL语句的构建器
+     * @see Configuration#addIncompleteStatement(XMLStatementBuilder) 添加未完成的语句
+     * @see IncompleteElementException 当语句解析不完整时抛出的异常
+     */
     private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
+        // 遍历SQL语句节点列表，处理每个语句元素
         for (XNode context : list) {
+            // 为每个语句节点创建XMLStatementBuilder实例，传入数据库ID参数
             final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
             try {
+                // 尝试解析语句节点，构建MappedStatement对象
                 statementParser.parseStatementNode();
             } catch (IncompleteElementException e) {
+                // 处理解析失败的语句，将其添加到待处理列表中
                 configuration.addIncompleteStatement(statementParser);
             }
         }
     }
+
 
     private void parsePendingResultMaps() {
         Collection<ResultMapResolver> incompleteResultMaps = configuration.getIncompleteResultMaps();
@@ -260,13 +331,52 @@ public class XMLMapperBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * 解析映射器XML文件中的缓存引用元素
+     * <p>
+     * 该方法负责解析&lt;cache-ref&gt;元素，配置当前命名空间引用其他命名空间的缓存。
+     * 通过缓存引用，多个命名空间可以共享同一个缓存实例，实现跨命名空间的缓存共享。
+     * 这相当于注解方式中的@CacheNamespaceRef功能。
+     * </p>
+     * <p>
+     * 执行流程：
+     * <ol>
+     *   <li>检查cache-ref元素是否存在</li>
+     *   <li>获取引用的缓存命名空间</li>
+     *   <li>在Configuration中注册缓存引用关系</li>
+     *   <li>创建CacheRefResolver实例尝试解析缓存引用</li>
+     *   <li>处理解析失败的情况，将未完成的引用添加到待处理列表</li>
+     * </ol>
+     * </p>
+     * <p>
+     * 注意事项：
+     * <ul>
+     *   <li>引用的缓存命名空间必须已存在，否则会抛出IncompleteElementException</li>
+     *   <li>缓存引用关系会被记录在Configuration中，用于后续验证</li>
+     *   <li>解析失败的缓存引用会被添加到待处理列表，后续会重试解析</li>
+     *   <li>缓存引用是单向的，不会形成循环依赖</li>
+     * </ul>
+     * </p>
+     *
+     * @param context cache-ref元素的XNode对象，包含namespace属性
+     * @throws IncompleteElementException 当引用的缓存命名空间不存在时抛出
+     * @see CacheRefResolver 缓存引用解析器
+     * @see MapperBuilderAssistant#useCacheRef(String) 使用缓存引用的方法
+     * @see Configuration#addCacheRef(String, String) 添加缓存引用关系的方法
+     * @see Configuration#addIncompleteCacheRef(CacheRefResolver) 添加未完成的缓存引用
+     */
     private void cacheRefElement(XNode context) {
+        // 检查cache-ref元素是否存在
         if (context != null) {
+            // 在Configuration中注册当前命名空间与引用缓存命名空间的映射关系
             configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
+            // 创建缓存引用解析器，用于解析引用的缓存
             CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
             try {
+                // 尝试解析缓存引用
                 cacheRefResolver.resolveCacheRef();
             } catch (IncompleteElementException e) {
+                // 如果解析失败（如引用的缓存不存在），将解析器添加到待处理列表
                 configuration.addIncompleteCacheRef(cacheRefResolver);
             }
         }
@@ -336,29 +446,83 @@ public class XMLMapperBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * 解析映射器XML文件中的参数映射元素，将XML配置转换为ParameterMapping对象并注册到配置中
+     *
+     * <p>该方法负责处理XML中的&lt;parameterMap&gt;元素，解析其中的参数映射配置，
+     * 包括参数类型、JDBC类型、模式、类型处理器等属性，最终构建ParameterMapping对象集合</p>
+     *
+     * <p>执行流程：</p>
+     * <ol>
+     *   <li>遍历参数映射节点列表，处理每个&lt;parameterMap&gt;元素</li>
+     *   <li>获取参数映射的ID和类型属性，解析类型对应的Java类</li>
+     *   <li>获取所有&lt;parameter&gt;子节点，构建参数映射列表</li>
+     *   <li>遍历每个参数节点，解析各项属性并创建ParameterMapping对象</li>
+     *   <li>将构建好的参数映射集合添加到配置中</li>
+     * </ol>
+     *
+     * <p>注意事项：</p>
+     * <ul>
+     *   <li>参数映射ID在当前命名空间内必须唯一</li>
+     *   <li>type属性指定的Java类必须存在且可加载</li>
+     *   <li>mode属性值必须是{@link ParameterMode}枚举的有效值</li>
+     *   <li>jdbcType属性值必须是{@link JdbcType}枚举的有效值</li>
+     *   <li>typeHandler属性指定的类型处理器必须实现{@link TypeHandler}接口</li>
+     * </ul>
+     *
+     * @param list 参数映射节点列表，包含所有需要解析的&lt;parameterMap&gt;元素
+     * @throws Exception 当参数解析或类型解析失败时抛出异常
+     * @see ParameterMapping
+     * @see ParameterMode
+     * @see JdbcType
+     * @see TypeHandler
+     * @see MapperBuilderAssistant#buildParameterMapping(Class, String, Class, JdbcType, String, ParameterMode, Class, Integer)
+     * @see MapperBuilderAssistant#addParameterMap(String, Class, List)
+     */
     private void parameterMapElement(List<XNode> list) throws Exception {
+        // 遍历参数映射节点列表，处理每个<parameterMap>元素
         for (XNode parameterMapNode : list) {
+            // 获取参数映射的唯一标识ID
             String id = parameterMapNode.getStringAttribute("id");
+            // 获取参数映射的类型属性
             String type = parameterMapNode.getStringAttribute("type");
+            // 解析类型字符串对应的Java类
             Class<?> parameterClass = resolveClass(type);
+            // 获取所有的<parameter>子节点
             List<XNode> parameterNodes = parameterMapNode.evalNodes("parameter");
+            // 创建参数映射列表，用于存储所有参数映射配置
             List<ParameterMapping> parameterMappings = new ArrayList<ParameterMapping>();
+            // 遍历每个参数节点，构建参数映射
             for (XNode parameterNode : parameterNodes) {
+                // 获取参数的属性名
                 String property = parameterNode.getStringAttribute("property");
+                // 获取参数的Java类型
                 String javaType = parameterNode.getStringAttribute("javaType");
+                // 获取参数的JDBC类型
                 String jdbcType = parameterNode.getStringAttribute("jdbcType");
+                // 获取参数关联的结果映射
                 String resultMap = parameterNode.getStringAttribute("resultMap");
+                // 获取参数的模式（IN、OUT、INOUT）
                 String mode = parameterNode.getStringAttribute("mode");
+                // 获取参数的类型处理器
                 String typeHandler = parameterNode.getStringAttribute("typeHandler");
+                // 获取参数的数值精度
                 Integer numericScale = parameterNode.getIntAttribute("numericScale");
+                // 解析参数模式字符串为枚举值
                 ParameterMode modeEnum = resolveParameterMode(mode);
+                // 解析Java类型字符串为类对象
                 Class<?> javaTypeClass = resolveClass(javaType);
+                // 解析JDBC类型字符串为枚举值
                 JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
+                // 解析类型处理器字符串为类对象，使用@SuppressWarnings抑制unchecked警告
                 @SuppressWarnings("unchecked")
                 Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
+                // 构建参数映射对象
                 ParameterMapping parameterMapping = builderAssistant.buildParameterMapping(parameterClass, property, javaTypeClass, jdbcTypeEnum, resultMap, modeEnum, typeHandlerClass, numericScale);
+                // 将参数映射添加到列表中
                 parameterMappings.add(parameterMapping);
             }
+            // 将构建好的参数映射集合添加到配置中
             builderAssistant.addParameterMap(id, parameterClass, parameterMappings);
         }
     }

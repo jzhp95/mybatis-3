@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2017 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2017 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.io;
 
@@ -57,212 +57,235 @@ import org.apache.ibatis.logging.LogFactory;
  * @author Tim Fennell
  */
 public class ResolverUtil<T> {
-  /*
-   * An instance of Log to use for logging in this class.
-   */
-  private static final Log log = LogFactory.getLog(ResolverUtil.class);
-
-  /**
-   * A simple interface that specifies how to test classes to determine if they
-   * are to be included in the results produced by the ResolverUtil.
-   */
-  public interface Test {
-    /**
-     * Will be called repeatedly with candidate classes. Must return True if a class
-     * is to be included in the results, false otherwise.
+    /*
+     * An instance of Log to use for logging in this class.
      */
-    boolean matches(Class<?> type);
-  }
+    private static final Log log = LogFactory.getLog(ResolverUtil.class);
 
-  /**
-   * A Test that checks to see if each class is assignable to the provided class. Note
-   * that this test will match the parent type itself if it is presented for matching.
-   */
-  public static class IsA implements Test {
-    private Class<?> parent;
-
-    /** Constructs an IsA test using the supplied Class as the parent class/interface. */
-    public IsA(Class<?> parentType) {
-      this.parent = parentType;
+    /**
+     * A simple interface that specifies how to test classes to determine if they
+     * are to be included in the results produced by the ResolverUtil.
+     */
+    public interface Test {
+        /**
+         * Will be called repeatedly with candidate classes. Must return True if a class
+         * is to be included in the results, false otherwise.
+         */
+        boolean matches(Class<?> type);
     }
 
-    /** Returns true if type is assignable to the parent type supplied in the constructor. */
-    @Override
-    public boolean matches(Class<?> type) {
-      return type != null && parent.isAssignableFrom(type);
-    }
+    /**
+     * A Test that checks to see if each class is assignable to the provided class. Note
+     * that this test will match the parent type itself if it is presented for matching.
+     */
+    public static class IsA implements Test {
+        private Class<?> parent;
 
-    @Override
-    public String toString() {
-      return "is assignable to " + parent.getSimpleName();
-    }
-  }
-
-  /**
-   * A Test that checks to see if each class is annotated with a specific annotation. If it
-   * is, then the test returns true, otherwise false.
-   */
-  public static class AnnotatedWith implements Test {
-    private Class<? extends Annotation> annotation;
-
-    /** Constructs an AnnotatedWith test for the specified annotation type. */
-    public AnnotatedWith(Class<? extends Annotation> annotation) {
-      this.annotation = annotation;
-    }
-
-    /** Returns true if the type is annotated with the class provided to the constructor. */
-    @Override
-    public boolean matches(Class<?> type) {
-      return type != null && type.isAnnotationPresent(annotation);
-    }
-
-    @Override
-    public String toString() {
-      return "annotated with @" + annotation.getSimpleName();
-    }
-  }
-
-  /** The set of matches being accumulated. */
-  private Set<Class<? extends T>> matches = new HashSet<Class<? extends T>>();
-
-  /**
-   * The ClassLoader to use when looking for classes. If null then the ClassLoader returned
-   * by Thread.currentThread().getContextClassLoader() will be used.
-   */
-  private ClassLoader classloader;
-
-  /**
-   * Provides access to the classes discovered so far. If no calls have been made to
-   * any of the {@code find()} methods, this set will be empty.
-   *
-   * @return the set of classes that have been discovered.
-   */
-  public Set<Class<? extends T>> getClasses() {
-    return matches;
-  }
-
-  /**
-   * Returns the classloader that will be used for scanning for classes. If no explicit
-   * ClassLoader has been set by the calling, the context class loader will be used.
-   *
-   * @return the ClassLoader that will be used to scan for classes
-   */
-  public ClassLoader getClassLoader() {
-    return classloader == null ? Thread.currentThread().getContextClassLoader() : classloader;
-  }
-
-  /**
-   * Sets an explicit ClassLoader that should be used when scanning for classes. If none
-   * is set then the context classloader will be used.
-   *
-   * @param classloader a ClassLoader to use when scanning for classes
-   */
-  public void setClassLoader(ClassLoader classloader) {
-    this.classloader = classloader;
-  }
-
-  /**
-   * Attempts to discover classes that are assignable to the type provided. In the case
-   * that an interface is provided this method will collect implementations. In the case
-   * of a non-interface class, subclasses will be collected.  Accumulated classes can be
-   * accessed by calling {@link #getClasses()}.
-   *
-   * @param parent the class of interface to find subclasses or implementations of
-   * @param packageNames one or more package names to scan (including subpackages) for classes
-   */
-  public ResolverUtil<T> findImplementations(Class<?> parent, String... packageNames) {
-    if (packageNames == null) {
-      return this;
-    }
-
-    Test test = new IsA(parent);
-    for (String pkg : packageNames) {
-      find(test, pkg);
-    }
-
-    return this;
-  }
-
-  /**
-   * Attempts to discover classes that are annotated with the annotation. Accumulated
-   * classes can be accessed by calling {@link #getClasses()}.
-   *
-   * @param annotation the annotation that should be present on matching classes
-   * @param packageNames one or more package names to scan (including subpackages) for classes
-   */
-  public ResolverUtil<T> findAnnotated(Class<? extends Annotation> annotation, String... packageNames) {
-    if (packageNames == null) {
-      return this;
-    }
-
-    Test test = new AnnotatedWith(annotation);
-    for (String pkg : packageNames) {
-      find(test, pkg);
-    }
-
-    return this;
-  }
-
-  /**
-   * Scans for classes starting at the package provided and descending into subpackages.
-   * Each class is offered up to the Test as it is discovered, and if the Test returns
-   * true the class is retained.  Accumulated classes can be fetched by calling
-   * {@link #getClasses()}.
-   *
-   * @param test an instance of {@link Test} that will be used to filter classes
-   * @param packageName the name of the package from which to start scanning for
-   *        classes, e.g. {@code net.sourceforge.stripes}
-   */
-  public ResolverUtil<T> find(Test test, String packageName) {
-    String path = getPackagePath(packageName);
-
-    try {
-      List<String> children = VFS.getInstance().list(path);
-      for (String child : children) {
-        if (child.endsWith(".class")) {
-          addIfMatching(test, child);
+        /** Constructs an IsA test using the supplied Class as the parent class/interface. */
+        public IsA(Class<?> parentType) {
+            this.parent = parentType;
         }
-      }
-    } catch (IOException ioe) {
-      log.error("Could not read package: " + packageName, ioe);
+
+        /** Returns true if type is assignable to the parent type supplied in the constructor. */
+        @Override
+        public boolean matches(Class<?> type) {
+            return type != null && parent.isAssignableFrom(type);
+        }
+
+        @Override
+        public String toString() {
+            return "is assignable to " + parent.getSimpleName();
+        }
     }
 
-    return this;
-  }
+    /**
+     * A Test that checks to see if each class is annotated with a specific annotation. If it
+     * is, then the test returns true, otherwise false.
+     */
+    public static class AnnotatedWith implements Test {
+        private Class<? extends Annotation> annotation;
 
-  /**
-   * Converts a Java package name to a path that can be looked up with a call to
-   * {@link ClassLoader#getResources(String)}.
-   *
-   * @param packageName The Java package name to convert to a path
-   */
-  protected String getPackagePath(String packageName) {
-    return packageName == null ? null : packageName.replace('.', '/');
-  }
+        /** Constructs an AnnotatedWith test for the specified annotation type. */
+        public AnnotatedWith(Class<? extends Annotation> annotation) {
+            this.annotation = annotation;
+        }
 
-  /**
-   * Add the class designated by the fully qualified class name provided to the set of
-   * resolved classes if and only if it is approved by the Test supplied.
-   *
-   * @param test the test used to determine if the class matches
-   * @param fqn the fully qualified name of a class
-   */
-  @SuppressWarnings("unchecked")
-  protected void addIfMatching(Test test, String fqn) {
-    try {
-      String externalName = fqn.substring(0, fqn.indexOf('.')).replace('/', '.');
-      ClassLoader loader = getClassLoader();
-      if (log.isDebugEnabled()) {
-        log.debug("Checking to see if class " + externalName + " matches criteria [" + test + "]");
-      }
+        /** Returns true if the type is annotated with the class provided to the constructor. */
+        @Override
+        public boolean matches(Class<?> type) {
+            return type != null && type.isAnnotationPresent(annotation);
+        }
 
-      Class<?> type = loader.loadClass(externalName);
-      if (test.matches(type)) {
-        matches.add((Class<T>) type);
-      }
-    } catch (Throwable t) {
-      log.warn("Could not examine class '" + fqn + "'" + " due to a " +
-          t.getClass().getName() + " with message: " + t.getMessage());
+        @Override
+        public String toString() {
+            return "annotated with @" + annotation.getSimpleName();
+        }
     }
-  }
+
+    /** The set of matches being accumulated. */
+    private Set<Class<? extends T>> matches = new HashSet<Class<? extends T>>();
+
+    /**
+     * The ClassLoader to use when looking for classes. If null then the ClassLoader returned
+     * by Thread.currentThread().getContextClassLoader() will be used.
+     */
+    private ClassLoader classloader;
+
+    /**
+     * Provides access to the classes discovered so far. If no calls have been made to
+     * any of the {@code find()} methods, this set will be empty.
+     *
+     * @return the set of classes that have been discovered.
+     */
+    public Set<Class<? extends T>> getClasses() {
+        return matches;
+    }
+
+    /**
+     * Returns the classloader that will be used for scanning for classes. If no explicit
+     * ClassLoader has been set by the calling, the context class loader will be used.
+     *
+     * @return the ClassLoader that will be used to scan for classes
+     */
+    public ClassLoader getClassLoader() {
+        return classloader == null ? Thread.currentThread().getContextClassLoader() : classloader;
+    }
+
+    /**
+     * Sets an explicit ClassLoader that should be used when scanning for classes. If none
+     * is set then the context classloader will be used.
+     *
+     * @param classloader a ClassLoader to use when scanning for classes
+     */
+    public void setClassLoader(ClassLoader classloader) {
+        this.classloader = classloader;
+    }
+
+    /**
+     * Attempts to discover classes that are assignable to the type provided. In the case
+     * that an interface is provided this method will collect implementations. In the case
+     * of a non-interface class, subclasses will be collected.  Accumulated classes can be
+     * accessed by calling {@link #getClasses()}.
+     *
+     * @param parent the class of interface to find subclasses or implementations of
+     * @param packageNames one or more package names to scan (including subpackages) for classes
+     */
+    public ResolverUtil<T> findImplementations(Class<?> parent, String... packageNames) {
+        if (packageNames == null) {
+            return this;
+        }
+
+        Test test = new IsA(parent);
+        for (String pkg : packageNames) {
+            find(test, pkg);
+        }
+
+        return this;
+    }
+
+    /**
+     * Attempts to discover classes that are annotated with the annotation. Accumulated
+     * classes can be accessed by calling {@link #getClasses()}.
+     *
+     * @param annotation the annotation that should be present on matching classes
+     * @param packageNames one or more package names to scan (including subpackages) for classes
+     */
+    public ResolverUtil<T> findAnnotated(Class<? extends Annotation> annotation, String... packageNames) {
+        if (packageNames == null) {
+            return this;
+        }
+
+        Test test = new AnnotatedWith(annotation);
+        for (String pkg : packageNames) {
+            find(test, pkg);
+        }
+
+        return this;
+    }
+
+    /**
+     * Scans for classes starting at the package provided and descending into subpackages.
+     * Each class is offered up to the Test as it is discovered, and if the Test returns
+     * true the class is retained.  Accumulated classes can be fetched by calling
+     * {@link #getClasses()}.
+     *
+     * 从提供的包开始扫描类，并递归扫描子包。每个类在发现时都会提供给Test进行测试，
+     * 如果Test返回true，则保留该类。可以通过调用{@link #getClasses()}获取累积的类。
+     *
+     * <p>执行流程：</p>
+     * <ol>
+     *   <li>将包名转换为文件系统路径格式</li>
+     *   <li>通过VFS获取路径下的所有资源</li>
+     *   <li>遍历所有以.class结尾的资源文件</li>
+     *   <li>对每个.class文件调用addIfMatching方法进行匹配测试</li>
+     *   <li>如果匹配成功，将类添加到结果集中</li>
+     * </ol>
+     *
+     * @param test an instance of {@link Test} that will be used to filter classes
+     *        用于过滤类的{@link Test}实例
+     * @param packageName the name of the package from which to start scanning for
+     *        classes, e.g. {@code net.sourceforge.stripes}
+     *        开始扫描类的包名，例如 {@code net.sourceforge.stripes}
+     * @return the current ResolverUtil instance for method chaining
+     *         当前ResolverUtil实例，支持方法链式调用
+     */
+    public ResolverUtil<T> find(Test test, String packageName) {
+        // 将包名转换为文件系统路径格式，例如：com.example -> com/example
+        String path = getPackagePath(packageName);
+
+        try {
+            // 通过VFS获取指定路径下的所有资源文件
+            List<String> children = VFS.getInstance().list(path);
+            // 遍历所有资源文件
+            for (String child : children) {
+                // 只处理.class文件，忽略其他类型文件
+                if (child.endsWith(".class")) {
+                    // 调用addIfMatching方法检查类是否匹配条件
+                    addIfMatching(test, child);
+                }
+            }
+        } catch (IOException ioe) {
+            // 捕获并记录IO异常，防止扫描过程中断
+            log.error("Could not read package: " + packageName, ioe);
+        }
+
+        // 返回当前实例，支持方法链式调用
+        return this;
+    }
+
+    /**
+     * Converts a Java package name to a path that can be looked up with a call to
+     * {@link ClassLoader#getResources(String)}.
+     *
+     * @param packageName The Java package name to convert to a path
+     */
+    protected String getPackagePath(String packageName) {
+        return packageName == null ? null : packageName.replace('.', '/');
+    }
+
+    /**
+     * Add the class designated by the fully qualified class name provided to the set of
+     * resolved classes if and only if it is approved by the Test supplied.
+     *
+     * @param test the test used to determine if the class matches
+     * @param fqn the fully qualified name of a class
+     */
+    @SuppressWarnings("unchecked")
+    protected void addIfMatching(Test test, String fqn) {
+        try {
+            String externalName = fqn.substring(0, fqn.indexOf('.')).replace('/', '.');
+            ClassLoader loader = getClassLoader();
+            if (log.isDebugEnabled()) {
+                log.debug("Checking to see if class " + externalName + " matches criteria [" + test + "]");
+            }
+
+            Class<?> type = loader.loadClass(externalName);
+            if (test.matches(type)) {
+                matches.add((Class<T>) type);
+            }
+        } catch (Throwable t) {
+            log.warn("Could not examine class '" + fqn + "'" + " due to a " +
+                    t.getClass().getName() + " with message: " + t.getMessage());
+        }
+    }
 }

@@ -103,20 +103,63 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return currentNamespace + "." + base;
     }
 
+    /**
+     * 引用其他命名空间的缓存作为当前命名空间的缓存
+     * <p>
+     * 该方法用于将当前命名空间的缓存设置为引用其他命名空间的缓存实例，
+     * 实现缓存共享。这种方式允许多个映射器接口共享同一个缓存实例，
+     * 避免重复创建缓存，提高资源利用率。
+     * </p>
+     * <p>
+     * 执行流程：
+     * <ol>
+     *   <li>验证命名空间参数是否为空</li>
+     *   <li>设置未解析缓存引用标志为true</li>
+     *   <li>从全局配置中获取指定命名空间的缓存实例</li>
+     *   <li>验证缓存实例是否存在</li>
+     *   <li>设置当前缓存为引用的缓存实例</li>
+     *   <li>重置未解析缓存引用标志为false</li>
+     *   <li>返回缓存实例</li>
+     * </ol>
+     * </p>
+     * <p>
+     * 注意事项：
+     * <ul>
+     *   <li>命名空间参数不能为null，否则抛出BuilderException</li>
+     *   <li>如果引用的缓存不存在，抛出IncompleteElementException</li>
+     *   <li>在解析过程中，unresolvedCacheRef标志用于处理循环依赖</li>
+     * </ul>
+     * </p>
+     *
+     * @param namespace 要引用的缓存所在的命名空间
+     * @return 被引用的缓存实例
+     * @throws BuilderException           当命名空间参数为null时抛出
+     * @throws IncompleteElementException 当引用的缓存不存在时抛出
+     * @see Configuration#getCache(String) 获取命名空间缓存的方法
+     * @see #useNewCache(Class, Class, Long, Integer, boolean, boolean, Properties) 创建新缓存的方法
+     */
     public Cache useCacheRef(String namespace) {
+        // 验证命名空间参数是否为null
         if (namespace == null) {
             throw new BuilderException("cache-ref element requires a namespace attribute.");
         }
         try {
+            // 设置未解析缓存引用标志为true，表示正在解析缓存引用
             unresolvedCacheRef = true;
+            // 从全局配置中获取指定命名空间的缓存实例
             Cache cache = configuration.getCache(namespace);
+            // 验证缓存实例是否存在
             if (cache == null) {
                 throw new IncompleteElementException("No cache for namespace '" + namespace + "' could be found.");
             }
+            // 设置当前缓存为引用的缓存实例
             currentCache = cache;
+            // 重置未解析缓存引用标志为false，表示缓存引用解析完成
             unresolvedCacheRef = false;
+            // 返回被引用的缓存实例
             return cache;
         } catch (IllegalArgumentException e) {
+            // 捕获IllegalArgumentException并转换为IncompleteElementException
             throw new IncompleteElementException("No cache for namespace '" + namespace + "' could be found.", e);
         }
     }
@@ -285,6 +328,63 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return new Discriminator.Builder(configuration, resultMapping, namespaceDiscriminatorMap).build();
     }
 
+    /**
+     * 添加映射语句到配置中，构建完整的MappedStatement对象
+     *
+     * <p>该方法负责根据提供的参数构建MappedStatement对象，并将其添加到Configuration中。
+     * MappedStatement是MyBatis中表示SQL语句映射的核心对象，包含了SQL语句的所有配置信息。</p>
+     *
+     * <p>执行流程：</p>
+     * <ol>
+     *   <li>检查缓存引用是否已解析，未解析则抛出异常</li>
+     *   <li>应用当前命名空间到语句ID</li>
+     *   <li>判断是否为SELECT语句类型</li>
+     *   <li>创建MappedStatement.Builder并设置各项属性</li>
+     *   <li>处理参数映射配置</li>
+     *   <li>构建MappedStatement对象并添加到配置中</li>
+     *   <li>返回构建的MappedStatement对象</li>
+     * </ol>
+     *
+     * <p>注意事项：</p>
+     * <ul>
+     *   <li>当存在未解析的缓存引用时，会抛出IncompleteElementException</li>
+     *   <li>语句ID会自动应用当前命名空间前缀</li>
+     *   <li>SELECT语句默认启用缓存，其他语句默认刷新缓存</li>
+     *   <li>resultMap和resultType通常只需指定一个，同时指定时resultMap优先</li>
+     *   <li>参数映射和结果映射会根据提供的配置自动构建或获取</li>
+     * </ul>
+     *
+     * @param id 语句的唯一标识符
+     * @param sqlSource SQL源对象，包含SQL语句和参数信息
+     * @param statementType 语句类型（STATEMENT、PREPARED、CALLABLE）
+     * @param sqlCommandType SQL命令类型（SELECT、INSERT、UPDATE、DELETE）
+     * @param fetchSize 获取数据的行数，用于控制数据库返回的数据量
+     * @param timeout 查询超时时间，单位为秒
+     * @param parameterMap 参数映射的ID引用
+     * @param parameterType 参数类型的Java类
+     * @param resultMap 结果映射的ID引用
+     * @param resultType 结果类型的Java类
+     * @param resultSetType 结果集类型（FORWARD_ONLY、SCROLL_INSENSITIVE、SCROLL_SENSITIVE）
+     * @param flushCache 是否刷新缓存
+     * @param useCache 是否使用缓存
+     * @param resultOrdered 是否结果有序
+     * @param keyGenerator 主键生成器
+     * @param keyProperty 主键属性名
+     * @param keyColumn 主键列名
+     * @param databaseId 数据库厂商ID
+     * @param lang 语言驱动
+     * @param resultSets 多结果集名称
+     * @return 构建的MappedStatement对象
+     * @throws IncompleteElementException 当缓存引用未解析时抛出
+     * @see MappedStatement SQL语句映射对象
+     * @see SqlSource SQL源接口
+     * @see StatementType 语句类型枚举
+     * @see SqlCommandType SQL命令类型枚举
+     * @see ResultSetType 结果集类型枚举
+     * @see KeyGenerator 主键生成器接口
+     * @see LanguageDriver 语言驱动接口
+     * @see Configuration#addMappedStatement(MappedStatement) 添加映射语句到配置中
+     */
     public MappedStatement addMappedStatement(
             String id,
             SqlSource sqlSource,
@@ -307,13 +407,17 @@ public class MapperBuilderAssistant extends BaseBuilder {
             LanguageDriver lang,
             String resultSets) {
 
+        // 检查缓存引用是否已解析，未解析则抛出异常
         if (unresolvedCacheRef) {
             throw new IncompleteElementException("Cache-ref not yet resolved");
         }
 
+        // 应用当前命名空间到语句ID
         id = applyCurrentNamespace(id, false);
+        // 判断是否为SELECT语句类型
         boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
 
+        // 创建MappedStatement.Builder并设置各项属性
         MappedStatement.Builder statementBuilder = new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType)
                 .resource(resource)
                 .fetchSize(fetchSize)
@@ -332,15 +436,21 @@ public class MapperBuilderAssistant extends BaseBuilder {
                 .useCache(valueOrDefault(useCache, isSelect))
                 .cache(currentCache);
 
+        // 处理参数映射配置
         ParameterMap statementParameterMap = getStatementParameterMap(parameterMap, parameterType, id);
         if (statementParameterMap != null) {
+            // 如果存在参数映射，则设置到构建器中
             statementBuilder.parameterMap(statementParameterMap);
         }
 
+        // 构建MappedStatement对象
         MappedStatement statement = statementBuilder.build();
+        // 将构建的MappedStatement对象添加到配置中
         configuration.addMappedStatement(statement);
+        // 返回构建的MappedStatement对象
         return statement;
     }
+
 
     private <T> T valueOrDefault(T value, T defaultValue) {
         return value == null ? defaultValue : value;
