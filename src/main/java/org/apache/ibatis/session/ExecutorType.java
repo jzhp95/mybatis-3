@@ -19,5 +19,11 @@ package org.apache.ibatis.session;
  * @author Clinton Begin
  */
 public enum ExecutorType {
-  SIMPLE, REUSE, BATCH
+  // 简单执行器类型：每次执行SQL语句都会创建一个新的PreparedStatement，执行完毕后关闭
+  SIMPLE,
+  // 重用执行器类型：会重用PreparedStatement对象，对于相同SQL语句的多次执行，会复用已创建的PreparedStatement
+  REUSE,
+  // 批处理执行器类型：将多个SQL语句批量执行，提高数据库操作效率
+  BATCH
 }
+

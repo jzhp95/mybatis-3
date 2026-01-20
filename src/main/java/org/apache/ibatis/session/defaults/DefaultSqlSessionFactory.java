@@ -95,27 +95,28 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
      * 2. 创建新的事务
      * 3. 创建执行器 (Executor)
      * 4. 构建并返回 DefaultSqlSession 实例
+     * <p>
+     * 执行流程：
+     * 1. 从配置中获取环境信息（Environment）
+     * 2. 根据环境获取事务工厂（TransactionFactory）
+     * 3. 使用事务工厂创建新的事务（Transaction）
+     * 4. 通过配置创建对应的执行器（Executor）
+     * 5. 使用配置、执行器和自动提交标志构建 DefaultSqlSession
+     * 6. 异常处理：关闭已获取的事务连接，包装并抛出异常
+     * 7. 最终清理：重置错误上下文
+     * <p>
+     * 设计说明：
+     * - 事务对象在 try 块外声明，确保在异常时能够正确关闭
+     * - 使用 ErrorContext 管理错误上下文，确保线程安全
+     * - 异常包装使用 ExceptionFactory，提供统一的异常处理机制
      *
      * @param execType   执行器类型，决定 SQL 执行的方式（SIMPLE/REUSE/BATCH）
      * @param level      事务隔离级别，可为 null 表示使用默认级别
      * @param autoCommit 是否自动提交事务
      * @return 新创建的 SqlSession 实例
      * @throws Exception 如果创建过程中发生任何异常，会包装成 MyBatis 异常抛出
-     *                   <p>
-     *                   执行流程：
-     *                   1. 从配置中获取环境信息（Environment）
-     *                   2. 根据环境获取事务工厂（TransactionFactory）
-     *                   3. 使用事务工厂创建新的事务（Transaction）
-     *                   4. 通过配置创建对应的执行器（Executor）
-     *                   5. 使用配置、执行器和自动提交标志构建 DefaultSqlSession
-     *                   6. 异常处理：关闭已获取的事务连接，包装并抛出异常
-     *                   7. 最终清理：重置错误上下文
-     *                   <p>
-     *                   设计说明：
-     *                   - 事务对象在 try 块外声明，确保在异常时能够正确关闭
-     *                   - 使用 ErrorContext 管理错误上下文，确保线程安全
-     *                   - 异常包装使用 ExceptionFactory，提供统一的异常处理机制
      */
+
     private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
         Transaction tx = null;
         try {
